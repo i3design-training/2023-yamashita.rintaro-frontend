@@ -5,16 +5,20 @@
     },
     "extends": [
         "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:@typescript-eslint/strict",
+        "plugin:eslint-comments/recommended",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
-        "plugin:@typescript-eslint/recommended",
         "prettier"
     ],
     "overrides": [
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
+        "project": ["./tsconfig.json"],
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
@@ -23,5 +27,8 @@
         "@typescript-eslint"
     ],
     "rules": {
+        // see: https://mysticatea.github.io/eslint-plugin-eslint-comments/rules/
+        "eslint-comments/require-description": "error",
+        "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }]
     }
 }

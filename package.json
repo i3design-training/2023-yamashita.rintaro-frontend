@@ -7,9 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src",
+    "lint": "eslint src && prettier --check src",
     "prepare": "husky install",
-    "eject": "rm -rf .git && npm pkg delete scripts.eject"
+    "eject": "rm -rf .git package-lock.json && npm pkg delete scripts.eject"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -23,6 +23,8 @@
     "@vitejs/plugin-react": "^2.2.0",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.2",
