@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "eject": "rm -rf .git && npm pkg delete scripts.eject"
   },
   "dependencies": {
     "react": "^18.2.0",
