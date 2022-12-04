@@ -27,8 +27,14 @@
         "@typescript-eslint"
     ],
     "rules": {
+        // see: https://typescript-eslint.io/rules/
+        "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
+        "@typescript-eslint/no-misused-promises": [
+            "error",
+            { "checksVoidReturn": { "arguments": false, "attributes": false } }
+        ],
         // see: https://mysticatea.github.io/eslint-plugin-eslint-comments/rules/
-        "eslint-comments/require-description": "error",
+        "eslint-comments/require-description": ["error"],
         "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }]
     }
 }
