@@ -1,11 +1,13 @@
 ## ルール
 
-ルールは以下の 3 段階を用意しています。 `strict` が最も厳しく、 `reccomended` 、 `baseline` と続きます。
-プロジェクトにおいては `recommended` を利用することを想定しています
+ルールは以下の 3 段階を用意しています。
 
 - baseline
 - recommended
 - strict
+
+`strict` が最も厳しく、 `reccomended` `baseline` と続きます。
+プロジェクトにおいては `recommended` を利用することを想定しています。
 
 ## ルールの詳細
 
