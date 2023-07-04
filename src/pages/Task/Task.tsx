@@ -33,7 +33,7 @@ export default function Tasks() {
       <Typography variant="h4" component="h4">
         TODOリスト
       </Typography>
-      ;
+
       <Box sx={{ display: 'flex' }}>
         <Box
           component="form"
