@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../../config/axios';
 
 const defaultTheme = createTheme();
 
@@ -18,20 +18,19 @@ export default function Registration() {
   const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [preRegistrationSuccess, setPreRegistrationSuccess] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(
-        'http://localhost:8000/api/users/provisionalRegister',
-        {
-          username,
-          email,
-          password,
-        },
-      );
+      const response = await apiClient.post('/users/provisionalRegister', {
+        username,
+        email,
+        password,
+      });
       console.log(response);
+      setPreRegistrationSuccess(true);
     } catch (error) {
       console.error('Error during registration:', error);
     }
@@ -69,6 +68,11 @@ export default function Registration() {
           <Typography component="h1" variant="h5">
             新規登録{' '}
           </Typography>
+          {preRegistrationSuccess && (
+            <Typography color="primary">
+              仮登録が完了しました。メールをご確認ください。
+            </Typography>
+          )}
           <Box
             component="form"
             noValidate
