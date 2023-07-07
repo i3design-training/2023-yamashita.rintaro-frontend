@@ -1,18 +1,21 @@
-import React, { useEffect } from 'react';
-import { Button, Container, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Alert, Button, Container, Typography } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { baseUrl } from '../../config/axios';
+import { apiClient } from '../../config/axios';
 
 const RegistrationComplete = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const [error, setError] = useState<string | null>(null);
+
   // tokenがある場合は本登録処理
   useEffect(() => {
     if (token) {
       const register = async (token: string) => {
         try {
-          await baseUrl.get(`/users/fullRegistration?token=${token}`);
+          await apiClient.get(`/users/fullRegistration?token=${token}`);
         } catch (error) {
+          setError('本登録処理に失敗しました。再度試してみてください。');
           console.log(error);
         }
       };
@@ -27,6 +30,7 @@ const RegistrationComplete = () => {
 
   return (
     <Container>
+      {error && <Alert severity="error">{error}</Alert>}
       <Typography variant="h4" component="h2" gutterBottom>
         登録が完了しました
       </Typography>
