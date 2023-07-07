@@ -24,14 +24,14 @@ export default function Registration() {
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/users/register',
+        'http://localhost:8000/api/users/provisionalRegister',
         {
           username,
           email,
           password,
         },
       );
-      console.log(response.data);
+      console.log(response);
     } catch (error) {
       console.error('Error during registration:', error);
     }

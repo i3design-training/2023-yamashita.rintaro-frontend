@@ -7,6 +7,7 @@ import Login from './pages/Login/Login';
 import Registration from './pages/Registration/Registration';
 import Header from './layout/Header';
 import Categories from './pages/Category/categories';
+import RegistrationComplete from './pages/Registration/RegistrationComplete';
 
 const sections = [
   { title: 'Task', url: '#' },
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: '/registration',
         element: <Registration />,
+      },
+      {
+        path: '/registrationComplete',
+        element: <RegistrationComplete />,
       },
       {
         path: '/tasks',
