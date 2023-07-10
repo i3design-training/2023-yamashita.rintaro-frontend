@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
+import { useToken } from '../../context/TokenContext';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,18 +11,22 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { apiClient } from '../../config/axios';
+import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
 export default function SignIn() {
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
+  const [token, setToken] = useToken();
+
+  const navigate = useNavigate();
 
   type ApiResponse = {
     token: string;
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
@@ -30,8 +34,10 @@ export default function SignIn() {
         email,
         password,
       });
-      localStorage.setItem('token', response.data.token);
+      // localStorage.setItem('token', response.data.token);
+      setToken(response.data.token);
       console.log(response);
+      navigate('/');
     } catch (error) {
       console.error('Error during registration:', error);
     }
