@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -8,6 +7,9 @@ import Registration from './pages/Registration/Registration';
 import Header from './layout/Header';
 import Categories from './pages/Category/categories';
 import RegistrationComplete from './pages/Registration/RegistrationComplete';
+import { TokenProvider } from './context/TokenContext';
+import { AuthRoute } from './routes/AuthRoute';
+import { StrictMode } from 'react';
 
 const sections = [
   { title: 'Task', url: '#' },
@@ -15,29 +17,42 @@ const sections = [
   { title: 'Tag', url: '#' },
 ];
 
+const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTRATION: '/registration',
+  REGISTRATION_COMPLETE: '/registrationComplete',
+  TASKS: '/tasks',
+  CATEGORIES: '/categories',
+};
+
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: ROUTES.HOME,
     element: <Header title="TODO" sections={sections} />,
     children: [
       {
-        path: '/login',
+        path: ROUTES.LOGIN,
         element: <Login />,
       },
       {
-        path: '/registration',
+        path: ROUTES.REGISTRATION,
         element: <Registration />,
       },
       {
-        path: '/registrationComplete',
+        path: ROUTES.REGISTRATION_COMPLETE,
         element: <RegistrationComplete />,
       },
       {
-        path: '/tasks',
-        element: <Tasks />,
+        path: ROUTES.TASKS,
+        element: (
+          <AuthRoute>
+            <Tasks />
+          </AuthRoute>
+        ),
       },
       {
-        path: '/categories',
+        path: ROUTES.CATEGORIES,
         element: <Categories />,
       },
     ],
@@ -48,8 +63,10 @@ const container = document.getElementById('root');
 
 if (container) {
   ReactDOM.createRoot(container).render(
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>,
+    <StrictMode>
+      <TokenProvider>
+        <RouterProvider router={router} />
+      </TokenProvider>
+    </StrictMode>,
   );
 }
