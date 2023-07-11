@@ -41,11 +41,6 @@ export default function Tasks() {
     setOpen(false);
   };
 
-  const handleCategorySubmit = (categoryName: string) => {
-    // apiClient.post('/')
-    handleCategoryClose();
-  };
-
   const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
     setTaskFormOpen(false);
@@ -97,7 +92,6 @@ export default function Tasks() {
         >
           新規タスク
         </Button>
-
         <Dialog open={taskformOpen} onClose={() => setTaskFormOpen(false)}>
           <DialogTitle>新規タスクを作成</DialogTitle>
           <DialogContent>
@@ -113,15 +107,10 @@ export default function Tasks() {
         >
           カテゴリ作成
         </Button>
-
         <Dialog open={open} onClose={handleCategoryClose}>
           <DialogTitle>カテゴリ作成</DialogTitle>
           <DialogContent>
-            <CategoryForm
-              open={open}
-              handleCategoryClose={() => setOpen(false)}
-              handleCategorySubmit={handleCategorySubmit}
-            />
+            <CategoryForm handleCategoryClose={() => setOpen(false)} />
           </DialogContent>
         </Dialog>
 
