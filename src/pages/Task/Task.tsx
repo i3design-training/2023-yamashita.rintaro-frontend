@@ -1,19 +1,66 @@
 import {
   List,
-  Box,
-  TextField,
-  Checkbox,
   ListItem,
   ListItemText,
-  ListItemIcon,
-  ListItemButton,
+  ListItemSecondaryAction,
+  IconButton,
+  Checkbox,
+  Box,
   Button,
   Typography,
+  Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material';
-import { useState } from 'react';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useState, useEffect } from 'react';
+import { apiClient } from '../../config/axios';
+import { useToken } from '../../context/TokenContext';
+import TodoForm from '../../component/todo/TodoForm';
+import CategoryForm from '../../component/category/CategoryForm';
+
+type Task = {
+  title: string;
+  description: string;
+  due_date: string;
+  category_id: string;
+  status_id: string;
+  UserId: string;
+};
 
 export default function Tasks() {
-  const [checked, setChecked] = useState([0]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [checked, setChecked] = useState<number[]>([]);
+  const [, , userId] = useToken();
+  const [open, setOpen] = useState(false);
+  const [taskformOpen, setTaskFormOpen] = useState(false);
+
+  const handleCategoryClose = () => {
+    setOpen(false);
+  };
+
+  const handleCategorySubmit = (categoryName: string) => {
+    // apiClient.post('/')
+    handleCategoryClose();
+  };
+
+  const handleNewTask = (task: Task) => {
+    setTasks((prevTasks) => [...prevTasks, task]);
+    setTaskFormOpen(false);
+  };
+
+  useEffect(() => {
+    apiClient
+      .get<Task[]>('/tasks', { params: { userId } })
+      .then((res) => {
+        setTasks(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const handleToggle = (value: number) => () => {
     const currentIndex = checked.indexOf(value);
@@ -29,59 +76,90 @@ export default function Tasks() {
   };
 
   return (
-    <>
-      <Typography variant="h4" component="h4">
-        TODOリスト
-      </Typography>
+    <Container component="main" maxWidth="sm">
+      <Box
+        sx={{
+          my: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h4" component="h2" gutterBottom>
+          TODOリスト
+        </Typography>
 
-      <Box sx={{ display: 'flex' }}>
-        <Box
-          component="form"
-          sx={{
-            '& > :not(style)': { marginRight: '20px', width: '50ch' },
-          }}
-          noValidate
-          autoComplete="off"
+        <Button
+          variant="contained"
+          onClick={() => setTaskFormOpen(true)}
+          fullWidth
+          sx={{ marginTop: 2 }}
         >
-          <TextField
-            id="outlined-basic"
-            label="TODOを入力してください"
-            variant="outlined"
-          />
-        </Box>
+          新規タスク
+        </Button>
 
-        <Button variant="contained">追加</Button>
+        <Dialog open={taskformOpen} onClose={() => setTaskFormOpen(false)}>
+          <DialogTitle>新規タスクを作成</DialogTitle>
+          <DialogContent>
+            <TodoForm onTaskCreated={handleNewTask} />
+          </DialogContent>
+        </Dialog>
+
+        <Button
+          variant="contained"
+          onClick={() => setOpen(true)}
+          fullWidth
+          sx={{ marginTop: 2 }}
+        >
+          カテゴリ作成
+        </Button>
+
+        <Dialog open={open} onClose={handleCategoryClose}>
+          <DialogTitle>カテゴリ作成</DialogTitle>
+          <DialogContent>
+            <CategoryForm
+              open={open}
+              handleCategoryClose={() => setOpen(false)}
+              handleCategorySubmit={handleCategorySubmit}
+            />
+          </DialogContent>
+        </Dialog>
+
+        {tasks.length > 0 ? (
+          <List sx={{ width: '100%', marginTop: 3 }}>
+            {tasks.map((task, index) => (
+              <ListItem key={index} dense button>
+                <Checkbox
+                  edge="start"
+                  checked={checked.includes(index)}
+                  tabIndex={-1}
+                  disableRipple
+                  inputProps={{
+                    'aria-labelledby': `checkbox-list-label-${index}`,
+                  }}
+                  onClick={handleToggle(index)}
+                />
+                <ListItemText
+                  id={`checkbox-list-label-${index}`}
+                  primary={task.title}
+                />
+                <ListItemSecondaryAction>
+                  <IconButton edge="end" aria-label="edit">
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton edge="end" aria-label="delete">
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Typography variant="h6" component="h3" sx={{ marginTop: 3 }}>
+            タスクがありません
+          </Typography>
+        )}
       </Box>
-      <List sx={{ width: '100%', maxWidth: 540, bgcolor: 'background.paper' }}>
-        {[0, 1, 2, 3].map((value) => {
-          const labelId = `checkbox-list-label-${value}`;
-
-          return (
-            <ListItem key={value} disablePadding>
-              <ListItemButton
-                role={undefined}
-                onClick={handleToggle(value)}
-                dense
-              >
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checked.indexOf(value) !== -1}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ 'aria-labelledby': labelId }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={labelId} primary={`Line item ${value + 1}`} />
-              </ListItemButton>
-              <Button variant="contained" sx={{ marginRight: '20px' }}>
-                編集
-              </Button>
-              <Button variant="contained">削除</Button>
-            </ListItem>
-          );
-        })}
-      </List>
-    </>
+    </Container>
   );
 }
