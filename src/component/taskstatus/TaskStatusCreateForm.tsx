@@ -2,25 +2,27 @@ import { DialogActions, TextField, Button } from '@mui/material';
 import React, { useState } from 'react';
 import { apiClient } from '../../config/axios';
 
-type CategoryFormProps = {
-  handleCategoryClose: () => void;
+type TaskStatusCreateFormProps = {
+  handleTaskStatusClose: () => void;
 };
 
-const CategoryForm: React.FC<CategoryFormProps> = ({ handleCategoryClose }) => {
-  const [categoryName, setCategoryName] = useState('');
+const TaskStatusCreateForm: React.FC<TaskStatusCreateFormProps> = ({
+  handleTaskStatusClose,
+}) => {
+  const [taskStatusName, setTaskStatusName] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await apiClient.post('/categories/create', {
-        name: categoryName,
+      const res = await apiClient.post('/taskstatus/create', {
+        name: taskStatusName,
       });
       console.log(res);
-      setCategoryName('');
-      handleCategoryClose();
+      setTaskStatusName('');
+      handleTaskStatusClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(`Error while creating task: ${err.message}`);
+        console.error(`taskstatus作成エラー: ${err.message}`);
       }
     }
   };
@@ -31,14 +33,14 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ handleCategoryClose }) => {
         autoFocus
         margin="dense"
         id="name"
-        label="カテゴリ名"
+        label="タスクステータス名"
         type="text"
         fullWidth
-        value={categoryName}
-        onChange={(e) => setCategoryName(e.target.value)}
+        value={taskStatusName}
+        onChange={(e) => setTaskStatusName(e.target.value)}
       />
       <DialogActions>
-        <Button onClick={handleCategoryClose} color="primary">
+        <Button onClick={handleTaskStatusClose} color="primary">
           キャンセル
         </Button>
         <Button type="submit" color="primary">
@@ -49,4 +51,4 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ handleCategoryClose }) => {
   );
 };
 
-export default CategoryForm;
+export default TaskStatusCreateForm;

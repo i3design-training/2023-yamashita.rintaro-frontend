@@ -19,7 +19,8 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
 import TodoForm from '../../component/todo/TodoForm';
-import CategoryForm from '../../component/category/CategoryForm';
+import CategoryCreateForm from '../../component/category/CategoryCreateForm';
+import TaskStatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
 
 type Task = {
   title: string;
@@ -35,7 +36,8 @@ export default function Tasks() {
   const [checked, setChecked] = useState<number[]>([]);
   const [, , userId] = useToken();
   const [categoryFormOpen, setCategoryFormOpen] = useState(false);
-  const [taskformOpen, setTaskFormOpen] = useState(false);
+  const [taskFormOpen, setTaskFormOpen] = useState(false);
+  const [taskStatusFormOpen, setTaskStatusFormOpen] = useState(false);
 
   const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
@@ -80,6 +82,7 @@ export default function Tasks() {
           TODOリスト
         </Typography>
 
+        {/* タスク作成 */}
         <Button
           variant="contained"
           onClick={() => setTaskFormOpen(true)}
@@ -88,13 +91,14 @@ export default function Tasks() {
         >
           新規タスク
         </Button>
-        <Dialog open={taskformOpen} onClose={() => setTaskFormOpen(false)}>
+        <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
           <DialogTitle>新規タスクを作成</DialogTitle>
           <DialogContent>
             <TodoForm onTaskCreated={handleNewTask} />
           </DialogContent>
         </Dialog>
 
+        {/* カテゴリー作成 */}
         <Button
           variant="contained"
           onClick={() => setCategoryFormOpen(true)}
@@ -109,8 +113,29 @@ export default function Tasks() {
         >
           <DialogTitle>カテゴリ作成</DialogTitle>
           <DialogContent>
-            <CategoryForm
+            <CategoryCreateForm
               handleCategoryClose={() => setCategoryFormOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+
+        {/* タスクステータス作成 */}
+        <Button
+          variant="contained"
+          onClick={() => setTaskStatusFormOpen(true)}
+          fullWidth
+          sx={{ marginTop: 2 }}
+        >
+          タスクステータス作成
+        </Button>
+        <Dialog
+          open={taskStatusFormOpen}
+          onClose={() => setTaskStatusFormOpen(false)}
+        >
+          <DialogTitle>タスクステータス作成</DialogTitle>
+          <DialogContent>
+            <TaskStatusCreateForm
+              handleTaskStatusClose={() => setTaskStatusFormOpen(false)}
             />
           </DialogContent>
         </Dialog>
