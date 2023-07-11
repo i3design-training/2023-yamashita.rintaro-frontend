@@ -34,12 +34,8 @@ export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [checked, setChecked] = useState<number[]>([]);
   const [, , userId] = useToken();
-  const [open, setOpen] = useState(false);
+  const [categoryFormOpen, setCategoryFormOpen] = useState(false);
   const [taskformOpen, setTaskFormOpen] = useState(false);
-
-  const handleCategoryClose = () => {
-    setOpen(false);
-  };
 
   const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
@@ -101,16 +97,21 @@ export default function Tasks() {
 
         <Button
           variant="contained"
-          onClick={() => setOpen(true)}
+          onClick={() => setCategoryFormOpen(true)}
           fullWidth
           sx={{ marginTop: 2 }}
         >
           カテゴリ作成
         </Button>
-        <Dialog open={open} onClose={handleCategoryClose}>
+        <Dialog
+          open={categoryFormOpen}
+          onClose={() => setCategoryFormOpen(false)}
+        >
           <DialogTitle>カテゴリ作成</DialogTitle>
           <DialogContent>
-            <CategoryForm handleCategoryClose={() => setOpen(false)} />
+            <CategoryForm
+              handleCategoryClose={() => setCategoryFormOpen(false)}
+            />
           </DialogContent>
         </Dialog>
 
