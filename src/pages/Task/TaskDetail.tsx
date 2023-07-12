@@ -15,15 +15,11 @@ type Task = {
 const TaskDetail = () => {
   const { taskId } = useParams();
   const [task, setTask] = useState<Task | null>(null);
-  console.log(taskId);
 
   useEffect(() => {
     apiClient
-      .get(`/tasks/${String(taskId)}`)
-      .then((res) => {
-        console.log(res);
-        // setTask(res.data);
-      })
+      .get<Task>(`/tasks/${String(taskId)}`)
+      .then((res) => setTask(res.data))
       .catch((err) => console.log('タスクを取得できませんでした', err));
   }, [taskId]);
 
@@ -32,10 +28,10 @@ const TaskDetail = () => {
       {task ? (
         <>
           <Typography variant="h4" component="h2" gutterBottom>
-            {task.title}
+            Title: {task.title}
           </Typography>
           <Typography variant="h6" gutterBottom>
-            {task.description}
+            Description: {task.description}
           </Typography>
           <Typography variant="body1" gutterBottom>
             Due date: {new Date(task.due_date).toLocaleDateString()}
