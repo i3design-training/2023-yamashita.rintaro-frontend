@@ -10,6 +10,7 @@ import RegistrationComplete from './pages/Registration/RegistrationComplete';
 import { TokenProvider } from './context/TokenContext';
 import { AuthRoute } from './routes/AuthRoute';
 import { StrictMode } from 'react';
+import TaskDetail from './pages/Task/TaskDetail';
 
 const sections = [
   { title: 'Task', url: '#' },
@@ -23,6 +24,7 @@ const ROUTES = {
   REGISTRATION: '/registration',
   REGISTRATION_COMPLETE: '/registrationComplete',
   TASKS: '/tasks',
+  TASK_DETAIL: '/tasks/:taskId', // const { taskId } = useParams(); in TaskDetail.tsx
   CATEGORIES: '/categories',
 };
 
@@ -51,6 +53,15 @@ const router = createBrowserRouter([
           </AuthRoute>
         ),
       },
+      {
+        path: ROUTES.TASK_DETAIL,
+        element: (
+          <AuthRoute>
+            <TaskDetail />
+          </AuthRoute>
+        ),
+      },
+
       {
         path: ROUTES.CATEGORIES,
         element: <Categories />,
