@@ -3,7 +3,6 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  IconButton,
   Checkbox,
   Box,
   Button,
@@ -13,42 +12,43 @@ import {
   DialogTitle,
   DialogContent,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
-import TodoForm from '../../component/todo/TodoForm';
 import CategoryCreateForm from '../../component/category/CategoryCreateForm';
 import TaskStatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
+import TaskCreateForm from '../../component/task/TaskCreateForm';
+import { Link } from 'react-router-dom';
 
-type Task = {
+type TaskWithID = {
+  id: string;
   title: string;
   description: string;
   due_date: string;
   category_id: string;
   status_id: string;
-  UserId: string;
+  user_id: string;
 };
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskWithID[]>([]);
   const [checked, setChecked] = useState<number[]>([]);
   const [, , userId] = useToken();
   const [categoryFormOpen, setCategoryFormOpen] = useState(false);
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const [taskStatusFormOpen, setTaskStatusFormOpen] = useState(false);
 
-  const handleNewTask = (task: Task) => {
+  const handleNewTask = (task: TaskWithID) => {
     setTasks((prevTasks) => [...prevTasks, task]);
     setTaskFormOpen(false);
   };
 
   useEffect(() => {
     apiClient
-      .get<Task[]>('/tasks', { params: { userId } })
+      .get<TaskWithID[]>('/tasks', { params: { userId } })
       .then((res) => {
         setTasks(res.data);
+        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -94,7 +94,10 @@ export default function Tasks() {
         <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
           <DialogTitle>新規タスクを作成</DialogTitle>
           <DialogContent>
-            <TodoForm onTaskCreated={handleNewTask} />
+            <TaskCreateForm
+              onTaskCreated={handleNewTask}
+              onClose={() => setTaskFormOpen(false)}
+            />
           </DialogContent>
         </Dialog>
 
@@ -159,12 +162,7 @@ export default function Tasks() {
                   primary={task.title}
                 />
                 <ListItemSecondaryAction>
-                  <IconButton edge="end" aria-label="edit">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton edge="end" aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
+                  <Link to={`/tasks/${String(task.id)}`}>詳細</Link>
                 </ListItemSecondaryAction>
               </ListItem>
             ))}

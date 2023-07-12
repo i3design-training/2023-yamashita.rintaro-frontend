@@ -1,5 +1,5 @@
-import { FC, ChangeEvent, FormEvent, useState } from 'react';
-import { Box, Button, TextField } from '@mui/material';
+import { FC, ChangeEvent, FormEvent, useState, useEffect } from 'react';
+import { Box, Button, TextField, MenuItem } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
 
@@ -9,25 +9,66 @@ type Task = {
   due_date: string;
   category_id: string;
   status_id: string;
-  UserId: string;
+  user_id: string;
+};
+
+// TaskWithIDの型定義
+type TaskWithID = Task & {
+  id: string;
+};
+
+type Category = {
+  id: string;
+  name: string;
+};
+
+type Status = {
+  id: string;
+  name: string;
 };
 
 type TodoFormProps = {
-  onTaskCreated: (task: Task) => void;
+  onTaskCreated: (task: TaskWithID) => void;
+  onClose: () => void;
 };
 
 const initialTaskState: Task = {
   title: '',
   description: '',
   due_date: '2023-07-11 11:24:28', // TODO 日付ピッカーで日時選択
-  category_id: '999dfe0f-e7c8-448b-9c19-2c3bd28db4fe', // TODO カテゴリー一覧を取得し、ドロップダウンに
-  status_id: '999e02d9-e953-4ff6-bdf1-c3c0f736c84c', // TODO ステータス一覧を取得し、ドロップダウンに
-  UserId: '',
+  category_id: '', // カテゴリー一覧を取得し、ドロップダウンに
+  status_id: '', // ステータス一覧を取得し、ドロップダウンに
+  user_id: '',
 };
 
-const TodoForm: FC<TodoFormProps> = ({ onTaskCreated }) => {
+const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
   const [, , userId] = useToken();
   const [formData, setFormData] = useState<Task>(initialTaskState);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [statuses, setStatuses] = useState<Status[]>([]);
+
+  useEffect(() => {
+    // カテゴリー一覧を取得
+    apiClient
+      .get<Category[]>('/categories')
+      .then((response) => {
+        console.log(response);
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error('カテゴリー取得できませんでした: ', error);
+      });
+
+    // ステータス一覧を取得
+    apiClient
+      .get<Status[]>('/taskstatus')
+      .then((response) => {
+        setStatuses(response.data);
+      })
+      .catch((error) => {
+        console.error('ステータス取得できませんでした: ', error);
+      });
+  }, []);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target;
@@ -41,12 +82,13 @@ const TodoForm: FC<TodoFormProps> = ({ onTaskCreated }) => {
     console.log(formData);
 
     try {
-      const res = await apiClient.post<Task>('/tasks/create', {
+      const res = await apiClient.post<TaskWithID>('/tasks/create', {
         ...formData,
         user_id: userId,
-      });
+      } as Task);
       setFormData(initialTaskState);
       onTaskCreated(res.data);
+      onClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(`Error while creating task: ${err.message}`);
@@ -68,14 +110,21 @@ const TodoForm: FC<TodoFormProps> = ({ onTaskCreated }) => {
         sx={{ marginBottom: 2 }}
       />
       <TextField
+        select
         name="category_id"
-        label="カテゴリーID"
+        label="カテゴリー"
         variant="outlined"
         value={category_id}
         onChange={handleInputChange}
         fullWidth
         sx={{ marginBottom: 2 }}
-      />
+      >
+        {categories.map((category) => (
+          <MenuItem key={category.id} value={category.id}>
+            {category.name}
+          </MenuItem>
+        ))}
+      </TextField>
       <TextField
         name="description"
         label="詳細"
@@ -95,19 +144,29 @@ const TodoForm: FC<TodoFormProps> = ({ onTaskCreated }) => {
         sx={{ marginBottom: 2 }}
       />
       <TextField
+        select
         name="status_id"
-        label="ステータスID"
+        label="ステータス"
         variant="outlined"
         value={status_id}
         onChange={handleInputChange}
         fullWidth
         sx={{ marginBottom: 2 }}
-      />
+      >
+        {statuses.map((status) => (
+          <MenuItem key={status.id} value={status.id}>
+            {status.name}
+          </MenuItem>
+        ))}
+      </TextField>
       <Button variant="contained" type="submit" fullWidth>
         追加
+      </Button>
+      <Button variant="text" onClick={onClose} fullWidth>
+        キャンセル
       </Button>
     </Box>
   );
 };
 
-export default TodoForm;
+export default TaskCreateForm;
