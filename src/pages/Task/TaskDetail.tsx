@@ -46,11 +46,15 @@ const TaskDetail = () => {
   };
 
   const onTaskUpdated = (updatedTask: Task) => {
-    console.log('Updated task: ', updatedTask);
+    // updatedTask: TaskEditFromのパラメータ
+    // setTaskに渡しても画面が更新されない
     setTask(updatedTask);
+    console.log(updatedTask);
     handleClose();
   };
 
+  // TODO パフォーマンス改善
+  // setTaskが２回呼ばれているのおかしい
   useEffect(() => {
     const fetchTaskAndDetails = async () => {
       try {
@@ -78,14 +82,14 @@ const TaskDetail = () => {
     // TypeScriptはそのPromiseが解決または拒否されるのを待つことができず、
     // その結果アプリケーションが不安定な状態になる可能性があると警告する
     void fetchTaskAndDetails();
-  }, [taskId]);
+  }, [taskId, task]); // TODO taskを条件から外す
 
   return (
     <Box sx={{ p: 2 }}>
       {task && taskId ? (
         <>
           <Typography variant="h4" component="h2">
-            Title: {task.title}
+            Title: {task['title']}
             <IconButton
               color="primary"
               aria-label="edit task"

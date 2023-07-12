@@ -72,7 +72,6 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
       const res = await apiClient.put<Task>(`/tasks/${taskId}`, {
         ...formData,
       } as Task);
-      setFormData(res.data);
       onTaskUpdated(res.data);
       handleClose();
     } catch (err: unknown) {
