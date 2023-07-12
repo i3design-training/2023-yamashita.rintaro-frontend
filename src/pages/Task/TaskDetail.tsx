@@ -20,9 +20,21 @@ type Task = {
   status_id: string;
 };
 
+type CategoryResponse = {
+  id: string;
+  name: string;
+};
+
+type StatusResponse = {
+  id: string;
+  name: string;
+};
+
 const TaskDetail = () => {
   const { taskId } = useParams<{ taskId?: string }>();
   const [task, setTask] = useState<Task | null>(null);
+  const [categoryName, setCategoryName] = useState<string | null>(null); // New
+  const [statusName, setStatusName] = useState<string | null>(null); // New
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -34,19 +46,38 @@ const TaskDetail = () => {
   };
 
   const onTaskUpdated = (updatedTask: Task) => {
+    console.log('Updated task: ', updatedTask);
     setTask(updatedTask);
     handleClose();
   };
 
   useEffect(() => {
-    if (!taskId) {
-      console.error('taskIdが見つかりません');
-      return;
-    }
-    apiClient
-      .get<Task>(`/tasks/${String(taskId)}`)
-      .then((res) => setTask(res.data))
-      .catch((err) => console.log('タスクを取得できませんでした', err));
+    const fetchTaskAndDetails = async () => {
+      try {
+        const res = await apiClient.get<Task>(`/tasks/${String(taskId)}`);
+        setTask(res.data);
+
+        // category_idをもとにカテゴリー取得
+        // 遅い。取得する必要ある？
+        const categoryResponse = await apiClient.get<CategoryResponse>(
+          `/categories/${res.data.category_id}`,
+        );
+        setCategoryName(categoryResponse.data.name);
+
+        // 取得する必要ある？
+        const statusResponse = await apiClient.get<StatusResponse>(
+          `/taskstatus/${res.data.status_id}`,
+        );
+        setStatusName(statusResponse.data.name);
+      } catch (err) {
+        console.log('タスクを取得できませんでした', err);
+      }
+    };
+    // useEffectの中で定義した非同期関数を呼び出す際に、
+    // その結果を待たないか、エラーハンドリングをしないと、
+    // TypeScriptはそのPromiseが解決または拒否されるのを待つことができず、
+    // その結果アプリケーションが不安定な状態になる可能性があると警告する
+    void fetchTaskAndDetails();
   }, [taskId]);
 
   return (
@@ -70,10 +101,8 @@ const TaskDetail = () => {
           <Typography variant="body1">
             Due date: {new Date(task.due_date).toLocaleDateString()}
           </Typography>
-          <Typography variant="body1">
-            Category ID: {task.category_id}
-          </Typography>
-          <Typography variant="body1">Status ID: {task.status_id}</Typography>
+          <Typography variant="body1">Category: {categoryName}</Typography>
+          <Typography variant="body1">Status: {statusName}</Typography>
           <Dialog open={open} onClose={handleClose}>
             <DialogContent>
               <TaskEditForm

@@ -20,10 +20,11 @@ type Status = {
   name: string;
 };
 
+// フォームコンポーネントが受け取るプロパティの型を定義
 type TaskEditFormProps = {
-  task: Task; // add task as prop
-  onTaskUpdated: (task: Task) => void;
-  handleClose: () => void;
+  task: Task;
+  onTaskUpdated: (task: Task) => void; // タスクが更新された後に呼び出す関数
+  handleClose: () => void; // フォームが閉じられる時に呼び出す関数
   taskId: string;
 };
 
@@ -71,7 +72,7 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
       const res = await apiClient.put<Task>(`/tasks/${taskId}`, {
         ...formData,
       } as Task);
-      setFormData(task);
+      setFormData(res.data);
       onTaskUpdated(res.data);
       handleClose();
     } catch (err: unknown) {
