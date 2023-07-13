@@ -24,7 +24,7 @@ export default function Header({ sections, title }: HeaderProps) {
     return isLogin
       ? [
           { path: '/', name: 'Home' },
-          { path: `/profile/${userName}`, name: 'Profile' },
+          { path: `/profile`, name: 'Profile' },
         ]
       : [
           { path: '/login', name: 'ログイン' },

@@ -10,16 +10,18 @@ type User = {
 
 const UserProfile = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [, , userId, , username] = useToken();
+  const [, , userId, , username, setUserName] = useToken();
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!username) return;
       try {
         const result = await apiClient.get<User>(`/users/${username}`);
-        console.log(result);
         setUser(result.data);
       } catch (error) {
-        console.log('ユーザー取得失敗', error);
+        setErrorMessage('ユーザー取得失敗');
       }
     };
 
@@ -31,19 +33,23 @@ const UserProfile = () => {
       setUser({
         ...user,
         [event.target.name]: event.target.value,
-      } as User); // User | null型であることを保証
+      } as User);
     }
   };
 
-  // const handleSubmit = async (event) => {
-  //   if (user) {
-  //     try {
-  //       await apiClient.put(`/users/${username}`, {});
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // };
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    // userがnullまたはundefinedでない場合にのみusernameプロパティにアクセス
+    if (user?.username) {
+      try {
+        await apiClient.put(`/users/${username}/edit`, user);
+        setUserName(user.username);
+        setSuccessMessage('ユーザー情報が更新されました');
+      } catch (error) {
+        setErrorMessage('ユーザー情報の更新に失敗しました');
+      }
+    }
+  };
 
   return user ? (
     <Container component="main" maxWidth="xs">
@@ -58,8 +64,7 @@ const UserProfile = () => {
         <Typography component="h1" variant="h5">
           User Profile
         </Typography>
-        {/* <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}> */}
-        <Box component="form" noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -94,6 +99,8 @@ const UserProfile = () => {
             Update
           </Button>
         </Box>
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
       </Box>
     </Container>
   ) : null;
