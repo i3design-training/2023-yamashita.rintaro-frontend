@@ -6,6 +6,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { apiClient } from '../config/axios';
+import { useToken } from '../context/TokenContext';
 
 type HeaderProps = {
   sections: ReadonlyArray<{
@@ -17,30 +19,32 @@ type HeaderProps = {
 
 export default function Header({ sections, title }: HeaderProps) {
   const [isLogin, setIsLogin] = useState(false);
+  const [token, setToken, userId, setUserId, , setUserName] = useToken();
   const userName = localStorage.getItem('userName') || '';
   const navigate = useNavigate();
 
-  const navItems = useMemo(() => {
-    return isLogin
-      ? [
-          { path: '/', name: 'Home' },
-          { path: `/profile`, name: 'Profile' },
-        ]
-      : [
-          { path: '/login', name: 'ログイン' },
-          { path: '/registration', name: '新規登録' },
-        ];
-  }, [isLogin, userName]);
-
   useEffect(() => {
     const checkLoginStatus = () => {
-      const token = localStorage.getItem('token');
       // 明示的にboolean型に変換
       setIsLogin(!!token);
     };
 
     checkLoginStatus();
-  }, []);
+  }, [token]);
+
+  const logout = async () => {
+    try {
+      await apiClient.post('/users/logout', { userId: userId });
+      localStorage.removeItem('token');
+      setIsLogin(false);
+      setToken('');
+      setUserId('');
+      setUserName('');
+      navigate('/login');
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -66,11 +70,7 @@ export default function Header({ sections, title }: HeaderProps) {
             >
               Profile
             </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => navigate(`/logout`)}
-            >
+            <Button variant="outlined" size="small" onClick={() => logout()}>
               ログアウト
             </Button>
           </>
@@ -92,20 +92,6 @@ export default function Header({ sections, title }: HeaderProps) {
             </Button>
           </>
         )}
-      </Toolbar>
-      <Toolbar component="nav" variant="dense" sx={{ overflowX: 'auto' }}>
-        {navItems.map((item) => (
-          <Link
-            color="inherit"
-            noWrap
-            key={item.name}
-            variant="body2"
-            href={item.path}
-            sx={{ p: 1, flexShrink: 0 }}
-          >
-            {item.name}
-          </Link>
-        ))}
       </Toolbar>
       <Outlet />
     </>
