@@ -11,7 +11,10 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
@@ -32,8 +35,10 @@ type TaskWithID = {
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<TaskWithID[]>([]);
+  const [originalTasks, setOriginalTasks] = useState<TaskWithID[]>([]); // 追加
   const [checked, setChecked] = useState<number[]>([]);
   const [, , userId] = useToken();
+  const [filterVal, setFilterVal] = useState('');
   const [categoryFormOpen, setCategoryFormOpen] = useState(false);
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const [taskStatusFormOpen, setTaskStatusFormOpen] = useState(false);
@@ -48,12 +53,28 @@ export default function Tasks() {
       .get<TaskWithID[]>('/tasks', { params: { userId } })
       .then((res) => {
         setTasks(res.data);
-        console.log(res);
+        setOriginalTasks(res.data);
+        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
+
+  useEffect(() => {
+    if (filterVal === '') {
+      setTasks(originalTasks);
+    } else {
+      const filteredData = tasks.filter((item) =>
+        item.title.toLowerCase().includes(filterVal),
+      );
+      setTasks(filteredData);
+    }
+  }, [filterVal, tasks]);
+
+  const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterVal(e.target.value);
+  };
 
   const handleToggle = (value: number) => () => {
     const currentIndex = checked.indexOf(value);
@@ -142,6 +163,24 @@ export default function Tasks() {
             />
           </DialogContent>
         </Dialog>
+
+        <Container maxWidth="md" sx={{ mt: 10 }}>
+          <TextField
+            id="search"
+            type="search"
+            label="Search"
+            defaultValue={''}
+            onChange={handleFilter}
+            InputProps={{
+              // TextFiledにアイコンなどの装飾をする
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Container>
 
         {tasks.length > 0 ? (
           <List sx={{ width: '100%', marginTop: 3 }}>
