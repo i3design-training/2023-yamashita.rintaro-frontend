@@ -2,11 +2,15 @@ import { FC, ChangeEvent, FormEvent, useState, useEffect } from 'react';
 import { Box, Button, TextField, MenuItem } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import dayjs, { Dayjs } from 'dayjs';
 
 type Task = {
   title: string;
   description: string;
-  due_date: string;
+  due_date: Dayjs;
   category_id: string;
   status_id: string;
   user_id: string;
@@ -35,7 +39,7 @@ type TodoFormProps = {
 const initialTaskState: Task = {
   title: '',
   description: '',
-  due_date: '2023-07-11 11:24:28', // TODO 日付ピッカーで日時選択
+  due_date: dayjs(), // TODO 日付ピッカーで日時選択
   category_id: '', // カテゴリー一覧を取得し、ドロップダウンに
   status_id: '', // ステータス一覧を取得し、ドロップダウンに
   user_id: '',
@@ -96,6 +100,16 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
     }
   };
 
+  // Date関係
+  const handleDateChange = (date: Dayjs | null) => {
+    if (date) {
+      setFormData((prevState) => ({
+        ...prevState,
+        due_date: date,
+      }));
+    }
+  };
+
   const { title, category_id, description, due_date, status_id } = formData;
 
   return (
@@ -134,7 +148,7 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
         fullWidth
         sx={{ marginBottom: 2 }}
       />
-      <TextField
+      {/* <TextField
         name="due_date"
         label="期日"
         variant="outlined"
@@ -142,7 +156,15 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
         onChange={handleInputChange}
         fullWidth
         sx={{ marginBottom: 2 }}
-      />
+      /> */}
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DemoContainer components={['DatePicker']}>
+          <DatePicker
+            defaultValue={dayjs(Date.now())}
+            onChange={handleDateChange}
+          />
+        </DemoContainer>
+      </LocalizationProvider>
       <TextField
         select
         name="status_id"
