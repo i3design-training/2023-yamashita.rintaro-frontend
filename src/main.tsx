@@ -9,8 +9,9 @@ import Categories from './pages/Category/categories';
 import RegistrationComplete from './pages/Registration/RegistrationComplete';
 import { TokenProvider } from './context/TokenContext';
 import { AuthRoute } from './routes/AuthRoute';
-import { StrictMode } from 'react';
+import { Profiler, StrictMode } from 'react';
 import TaskDetail from './pages/Task/TaskDetail';
+import UserProfile from './pages/User/profile';
 
 const sections = [
   { title: 'Task', url: '#' },
@@ -21,6 +22,7 @@ const sections = [
 const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
+  PROFILE: '/profile',
   REGISTRATION: '/registration',
   REGISTRATION_COMPLETE: '/registrationComplete',
   TASKS: '/tasks',
@@ -61,7 +63,10 @@ const router = createBrowserRouter([
           </AuthRoute>
         ),
       },
-
+      {
+        path: ROUTES.PROFILE,
+        element: <UserProfile />,
+      },
       {
         path: ROUTES.CATEGORIES,
         element: <Categories />,

@@ -16,6 +16,8 @@ const TokenContext = createContext<
     Dispatch<SetStateAction<string>>,
     string,
     Dispatch<SetStateAction<string>>,
+    string,
+    Dispatch<SetStateAction<string>>,
   ]
 >([
   '',
@@ -26,6 +28,10 @@ const TokenContext = createContext<
   () => {
     throw new Error('setUserId function must be overridden');
   },
+  '',
+  () => {
+    throw new Error('setUserName function must be overridden');
+  },
 ]);
 
 type TokenProviderProps = {
@@ -35,16 +41,22 @@ type TokenProviderProps = {
 export const TokenProvider: FC<TokenProviderProps> = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') ?? '');
   const [userId, setUserId] = useState(localStorage.getItem('userId') ?? '');
+  const [userName, setUserName] = useState(
+    localStorage.getItem('userName') ?? '',
+  );
 
   // 再ログイン時など、トークンが変更されたときにlocalStorageを更新
   useEffect(() => {
     localStorage.setItem('token', token);
     localStorage.setItem('userId', userId);
-  }, [token, userId]);
+    localStorage.setItem('userName', userName);
+  }, [token, userId, userName]);
 
   return (
     // 子コンポーネントからトークンを取得・更新可能に
-    <TokenContext.Provider value={[token, setToken, userId, setUserId]}>
+    <TokenContext.Provider
+      value={[token, setToken, userId, setUserId, userName, setUserName]}
+    >
       {children}
     </TokenContext.Provider>
   );

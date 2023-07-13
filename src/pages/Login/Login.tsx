@@ -18,13 +18,15 @@ const defaultTheme = createTheme();
 export default function SignIn() {
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
-  const [token, setToken, userId, setUserId] = useToken();
+  const [token, setToken, userId, setUserId, userName, setUserName] =
+    useToken();
 
   const navigate = useNavigate();
 
   type ApiResponse = {
     token: string;
     user_id: string;
+    username: string;
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -38,6 +40,7 @@ export default function SignIn() {
       localStorage.setItem('userId', response.data.user_id);
       setToken(response.data.token);
       setUserId(response.data.user_id);
+      setUserName(response.data.username);
       console.log(response);
       navigate('/');
     } catch (error) {
