@@ -39,6 +39,7 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
   const [statuses, setStatuses] = useState<Status[]>([]);
 
   useEffect(() => {
+    // TODO Joinテーブルでcategory.nameとtaskstatus.nameを一緒に返す
     apiClient
       .get<Category[]>('/categories')
       .then((response) => {
