@@ -2,19 +2,29 @@ import { FC, ChangeEvent, FormEvent, useState, useEffect } from 'react';
 import { Box, Button, TextField, MenuItem } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import dayjs, { Dayjs } from 'dayjs';
 
-type Task = {
+// uuidはサーバー側で生成されるので、idは送信したくない
+type TaskWithoutID = {
   title: string;
   description: string;
-  due_date: string;
+  due_date: Dayjs;
   category_id: string;
   status_id: string;
   user_id: string;
 };
 
-// TaskWithIDの型定義
-type TaskWithID = Task & {
+type Task = {
   id: string;
+  title: string;
+  description: string;
+  due_date: Dayjs;
+  category_id: string;
+  status_id: string;
+  user_id: string;
 };
 
 type Category = {
@@ -28,14 +38,17 @@ type Status = {
 };
 
 type TodoFormProps = {
-  onTaskCreated: (task: TaskWithID) => void;
+  // set関数だからvoidでOK
+  // 送信はIDを、入れたくない
+  // レスポンスにはIDが欲しい
+  onTaskCreated: (task: Task) => void;
   onClose: () => void;
 };
 
-const initialTaskState: Task = {
+const initialTaskState: TaskWithoutID = {
   title: '',
   description: '',
-  due_date: '2023-07-11 11:24:28', // TODO 日付ピッカーで日時選択
+  due_date: dayjs(), // TODO 日付ピッカーで日時選択
   category_id: '', // カテゴリー一覧を取得し、ドロップダウンに
   status_id: '', // ステータス一覧を取得し、ドロップダウンに
   user_id: '',
@@ -43,7 +56,7 @@ const initialTaskState: Task = {
 
 const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
   const [, , userId] = useToken();
-  const [formData, setFormData] = useState<Task>(initialTaskState);
+  const [formData, setFormData] = useState<TaskWithoutID>(initialTaskState);
   const [categories, setCategories] = useState<Category[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
 
@@ -82,17 +95,33 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
     console.log(formData);
 
     try {
-      const res = await apiClient.post<TaskWithID>('/tasks/create', {
+      const res = await apiClient.post<Task>('/tasks/create', {
         ...formData,
         user_id: userId,
-      } as Task);
+      } as TaskWithoutID); // IDなしで送信
       setFormData(initialTaskState);
+      // Task.tsx
+      //    onTaskCreated={handleNewTask}
+      //    const handleNewTask = (task: Task) => {
+      //      setTasks((prevTasks) => [...prevTasks, task]);
+      //      setTaskFormOpen(false);
+      //    };
       onTaskCreated(res.data);
       onClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(`Error while creating task: ${err.message}`);
       }
+    }
+  };
+
+  // Date関係
+  const handleDateChange = (date: Dayjs | null) => {
+    if (date) {
+      setFormData((prevState) => ({
+        ...prevState,
+        due_date: date,
+      }));
     }
   };
 
@@ -134,15 +163,14 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
         fullWidth
         sx={{ marginBottom: 2 }}
       />
-      <TextField
-        name="due_date"
-        label="期日"
-        variant="outlined"
-        value={due_date}
-        onChange={handleInputChange}
-        fullWidth
-        sx={{ marginBottom: 2 }}
-      />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DemoContainer components={['DatePicker']}>
+          <DatePicker
+            defaultValue={dayjs(Date.now())}
+            onChange={handleDateChange}
+          />
+        </DemoContainer>
+      </LocalizationProvider>
       <TextField
         select
         name="status_id"

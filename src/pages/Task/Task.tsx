@@ -23,7 +23,7 @@ import TaskStatusCreateForm from '../../component/taskstatus/TaskStatusCreateFor
 import TaskCreateForm from '../../component/task/TaskCreateForm';
 import { Link } from 'react-router-dom';
 
-type TaskWithID = {
+type Task = {
   id: string;
   title: string;
   description: string;
@@ -34,8 +34,8 @@ type TaskWithID = {
 };
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState<TaskWithID[]>([]);
-  const [originalTasks, setOriginalTasks] = useState<TaskWithID[]>([]); // 追加
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [originalTasks, setOriginalTasks] = useState<Task[]>([]); // 追加
   const [checked, setChecked] = useState<number[]>([]);
   const [, , userId] = useToken();
   const [filterVal, setFilterVal] = useState('');
@@ -43,14 +43,14 @@ export default function Tasks() {
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const [taskStatusFormOpen, setTaskStatusFormOpen] = useState(false);
 
-  const handleNewTask = (task: TaskWithID) => {
+  const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
     setTaskFormOpen(false);
   };
 
   useEffect(() => {
     apiClient
-      .get<TaskWithID[]>('/tasks', { params: { userId } })
+      .get<Task[]>('/tasks', { params: { userId } })
       .then((res) => {
         setTasks(res.data);
         setOriginalTasks(res.data);
@@ -70,7 +70,7 @@ export default function Tasks() {
       );
       setTasks(filteredData);
     }
-  }, [filterVal, tasks]);
+  }, [filterVal]);
 
   const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterVal(e.target.value);
