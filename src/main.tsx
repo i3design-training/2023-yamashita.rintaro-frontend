@@ -13,12 +13,6 @@ import { Profiler, StrictMode } from 'react';
 import TaskDetail from './pages/Task/TaskDetail';
 import UserProfile from './pages/User/profile';
 
-const sections = [
-  { title: 'Task', url: '#' },
-  { title: 'Category', url: '#' },
-  { title: 'Tag', url: '#' },
-];
-
 const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
@@ -29,6 +23,12 @@ const ROUTES = {
   TASK_DETAIL: '/tasks/:taskId', // const { taskId } = useParams(); in TaskDetail.tsx
   CATEGORIES: '/categories',
 };
+
+const sections = [
+  { title: 'Task', url: ROUTES.TASKS },
+  { title: 'Category', url: ROUTES.CATEGORIES },
+  { title: 'TaskStatus', url: ROUTES.CATEGORIES },
+];
 
 const router = createBrowserRouter([
   {
