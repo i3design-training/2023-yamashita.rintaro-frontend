@@ -22,12 +22,13 @@ import CategoryCreateForm from '../../component/category/CategoryCreateForm';
 import TaskStatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
 import TaskCreateForm from '../../component/task/TaskCreateForm';
 import { Link } from 'react-router-dom';
+import { Dayjs } from 'dayjs';
 
 type Task = {
   id: string;
   title: string;
   description: string;
-  due_date: string;
+  due_date: Dayjs;
   category_id: string;
   status_id: string;
   user_id: string;
@@ -39,7 +40,6 @@ export default function Tasks() {
   const [checked, setChecked] = useState<number[]>([]);
   const [, , userId] = useToken();
   const [filterVal, setFilterVal] = useState('');
-  const [categoryFormOpen, setCategoryFormOpen] = useState(false);
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const [taskStatusFormOpen, setTaskStatusFormOpen] = useState(false);
 
@@ -90,59 +90,35 @@ export default function Tasks() {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container component="main" maxWidth="md">
       <Box
         sx={{
           my: 3,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
         }}
       >
-        <Typography variant="h4" component="h2" gutterBottom>
-          TODOリスト
-        </Typography>
+        <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
+          <Typography variant="h3">TODOリスト</Typography>
 
-        {/* タスク作成 */}
-        <Button
-          variant="contained"
-          onClick={() => setTaskFormOpen(true)}
-          fullWidth
-          sx={{ marginTop: 2 }}
-        >
-          新規タスク
-        </Button>
-        <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
-          <DialogTitle>新規タスクを作成</DialogTitle>
-          <DialogContent>
-            <TaskCreateForm
-              onTaskCreated={handleNewTask}
-              onClose={() => setTaskFormOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
-
-        {/* カテゴリー作成 */}
-        <Button
-          variant="contained"
-          onClick={() => setCategoryFormOpen(true)}
-          fullWidth
-          sx={{ marginTop: 2 }}
-        >
-          カテゴリ作成
-        </Button>
-        <Dialog
-          open={categoryFormOpen}
-          onClose={() => setCategoryFormOpen(false)}
-        >
-          <DialogTitle>カテゴリ作成</DialogTitle>
-          <DialogContent>
-            <CategoryCreateForm
-              handleCategoryClose={() => setCategoryFormOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
-
+          {/* タスク作成 */}
+          <Button
+            variant="contained"
+            onClick={() => setTaskFormOpen(true)}
+            sx={{ marginTop: 2 }}
+          >
+            新規タスク
+          </Button>
+          <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
+            <DialogTitle>新規タスクを作成</DialogTitle>
+            <DialogContent>
+              <TaskCreateForm
+                onTaskCreated={handleNewTask}
+                onClose={() => setTaskFormOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </Box>
         {/* タスクステータス作成 */}
         <Button
           variant="contained"

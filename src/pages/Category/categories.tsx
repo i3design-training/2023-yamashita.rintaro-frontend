@@ -5,7 +5,16 @@ import {
   Typography,
   Card,
   CardContent,
+  Container,
+  CssBaseline,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Box,
 } from '@mui/material';
+import { apiClient } from '../../config/axios';
+import CategoryCreateForm from '../../component/category/CategoryCreateForm';
 
 type Category = {
   id: number;
@@ -14,14 +23,14 @@ type Category = {
 
 const Categories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryFormOpen, setCategoryFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
-        const data: Category[] = (await response.json()) as Category[];
-        setCategories(data);
+        const response = await apiClient<Category[]>('/categories');
+        setCategories(response.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -37,19 +46,49 @@ const Categories: React.FC = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <Grid container spacing={3}>
-          {categories.map((category) => (
-            <Grid item xs={12} sm={6} md={4} key={category.id}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h5" component="div">
-                    {category.name}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <Container component="main" maxWidth="md">
+          <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
+            <Typography variant="h3" textAlign={'center'}>
+              Category
+            </Typography>
+            {/* カテゴリー作成 */}
+            <Button
+              variant="contained"
+              onClick={() => setCategoryFormOpen(true)}
+              sx={{ marginTop: 2 }}
+            >
+              カテゴリ作成
+            </Button>
+            <Dialog
+              open={categoryFormOpen}
+              onClose={() => setCategoryFormOpen(false)}
+            >
+              <DialogTitle>カテゴリ作成</DialogTitle>
+              <DialogContent>
+                <CategoryCreateForm
+                  handleCategoryClose={() => setCategoryFormOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+          </Box>
+          <Grid container spacing={3}>
+            {categories.map((category) => (
+              <Grid item xs={12} sm={6} md={3} key={category.id}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography
+                      variant="h5"
+                      component="div"
+                      textAlign={'center'}
+                    >
+                      {category.name}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
       )}
     </div>
   );
