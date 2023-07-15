@@ -10,6 +10,16 @@ type Task = {
   status_id: string;
 };
 
+type TaskWithCategoryNameStatusName = {
+  title: string;
+  description: string;
+  due_date: string;
+  category_id: string;
+  status_id: string;
+  category_name: string;
+  taskstatus_name: string;
+};
+
 type Category = {
   id: string;
   name: string;
@@ -72,7 +82,8 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
     try {
       const res = await apiClient.put<Task>(`/tasks/${taskId}`, {
         ...formData,
-      } as Task);
+      } as TaskWithCategoryNameStatusName);
+      console.log(res.data);
       onTaskUpdated(res.data);
       handleClose();
     } catch (err: unknown) {

@@ -14,23 +14,23 @@ import {
   Box,
 } from '@mui/material';
 import { apiClient } from '../../config/axios';
-import CategoryCreateForm from '../../component/category/CategoryCreateForm';
+import StatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
 
-type Category = {
+type Status = {
   id: number;
   name: string;
 };
 
-const Categories: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryFormOpen, setCategoryFormOpen] = useState(false);
+const TaskStatuses: React.FC = () => {
+  const [statuses, setStatuses] = useState<Status[]>([]);
+  const [statusFormOpen, setStatusFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchStatuses = async () => {
       try {
-        const response = await apiClient<Category[]>('/categories');
-        setCategories(response.data);
+        const response = await apiClient<Status[]>('/taskstatus');
+        setStatuses(response.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -38,42 +38,42 @@ const Categories: React.FC = () => {
       }
     };
 
-    fetchCategories().catch((error) => console.error(error));
+    fetchStatuses().catch((error) => console.error(error));
   }, []);
 
   return (
-    <div>
+    <>
       {loading ? (
         <CircularProgress />
       ) : (
         <Container component="main" maxWidth="md">
           <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
             <Typography variant="h3" textAlign={'center'}>
-              Category
+              Status
             </Typography>
-            {/* カテゴリー作成 */}
+            {/* ステータス作成 */}
             <Button
               variant="contained"
-              onClick={() => setCategoryFormOpen(true)}
+              onClick={() => setStatusFormOpen(true)}
               sx={{ marginTop: 2 }}
             >
-              カテゴリ作成
+              ステータス作成
             </Button>
             <Dialog
-              open={categoryFormOpen}
-              onClose={() => setCategoryFormOpen(false)}
+              open={statusFormOpen}
+              onClose={() => setStatusFormOpen(false)}
             >
-              <DialogTitle>カテゴリ作成</DialogTitle>
+              <DialogTitle>ステータス作成</DialogTitle>
               <DialogContent>
-                <CategoryCreateForm
-                  handleCategoryClose={() => setCategoryFormOpen(false)}
+                <StatusCreateForm
+                  handleTaskStatusClose={() => setStatusFormOpen(false)}
                 />
               </DialogContent>
             </Dialog>
           </Box>
           <Grid container spacing={3}>
-            {categories.map((category) => (
-              <Grid item xs={12} sm={6} md={3} key={category.id}>
+            {statuses.map((status) => (
+              <Grid item xs={12} sm={6} md={3} key={status.id}>
                 <Card variant="outlined">
                   <CardContent>
                     <Typography
@@ -81,7 +81,7 @@ const Categories: React.FC = () => {
                       component="div"
                       textAlign={'center'}
                     >
-                      {category.name}
+                      {status.name}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -90,8 +90,8 @@ const Categories: React.FC = () => {
           </Grid>
         </Container>
       )}
-    </div>
+    </>
   );
 };
 
-export default Categories;
+export default TaskStatuses;

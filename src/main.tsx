@@ -12,12 +12,7 @@ import { AuthRoute } from './routes/AuthRoute';
 import { Profiler, StrictMode } from 'react';
 import TaskDetail from './pages/Task/TaskDetail';
 import UserProfile from './pages/User/profile';
-
-const sections = [
-  { title: 'Task', url: '#' },
-  { title: 'Category', url: '#' },
-  { title: 'Tag', url: '#' },
-];
+import TaskStatuses from './pages/TaskStatus/taskstatus';
 
 const ROUTES = {
   HOME: '/',
@@ -27,8 +22,15 @@ const ROUTES = {
   REGISTRATION_COMPLETE: '/registrationComplete',
   TASKS: '/tasks',
   TASK_DETAIL: '/tasks/:taskId', // const { taskId } = useParams(); in TaskDetail.tsx
+  TASKSTATUS: '/taskstatus',
   CATEGORIES: '/categories',
 };
+
+const sections = [
+  { title: 'Task', url: ROUTES.TASKS },
+  { title: 'Category', url: ROUTES.CATEGORIES },
+  { title: 'TaskStatus', url: ROUTES.TASKSTATUS },
+];
 
 const router = createBrowserRouter([
   {
@@ -70,6 +72,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.CATEGORIES,
         element: <Categories />,
+      },
+      {
+        path: ROUTES.TASKSTATUS,
+        element: <TaskStatuses />,
       },
     ],
   },

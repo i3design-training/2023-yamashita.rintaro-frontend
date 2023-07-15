@@ -7,6 +7,7 @@ import {
   IconButton,
   Dialog,
   DialogContent,
+  Container,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,23 +19,13 @@ type Task = {
   due_date: string;
   category_id: string;
   status_id: string;
-};
-
-type CategoryResponse = {
-  id: string;
-  name: string;
-};
-
-type StatusResponse = {
-  id: string;
-  name: string;
+  category_name: string;
+  taskstatus_name: string;
 };
 
 const TaskDetail = () => {
   const { taskId } = useParams<{ taskId?: string }>();
   const [task, setTask] = useState<Task | null>(null);
-  const [categoryName, setCategoryName] = useState<string | null>(null); // New
-  const [statusName, setStatusName] = useState<string | null>(null); // New
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -59,20 +50,8 @@ const TaskDetail = () => {
     const fetchTaskAndDetails = async () => {
       try {
         const res = await apiClient.get<Task>(`/tasks/${String(taskId)}`);
+        console.log(res.data);
         setTask(res.data);
-
-        // category_idをもとにカテゴリー取得
-        // 遅い。取得する必要ある？
-        const categoryResponse = await apiClient.get<CategoryResponse>(
-          `/categories/${res.data.category_id}`,
-        );
-        setCategoryName(categoryResponse.data.name);
-
-        // 取得する必要ある？
-        const statusResponse = await apiClient.get<StatusResponse>(
-          `/taskstatus/${res.data.status_id}`,
-        );
-        setStatusName(statusResponse.data.name);
       } catch (err) {
         console.log('タスクを取得できませんでした', err);
       }
@@ -82,46 +61,54 @@ const TaskDetail = () => {
     // TypeScriptはそのPromiseが解決または拒否されるのを待つことができず、
     // その結果アプリケーションが不安定な状態になる可能性があると警告する
     void fetchTaskAndDetails();
-  }, [taskId, task]); // TODO taskを条件から外す
+  }, [taskId, task]); // TODO taskを外す。無限ループする
 
   return (
-    <Box sx={{ p: 2 }}>
-      {task && taskId ? (
-        <>
-          <Typography variant="h4" component="h2">
-            Title: {task['title']}
-            <IconButton
-              color="primary"
-              aria-label="edit task"
-              onClick={handleOpen}
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton color="secondary" aria-label="delete task">
-              <DeleteIcon />
-            </IconButton>
-          </Typography>
-          <Typography variant="h6">Description: {task.description}</Typography>
-          <Typography variant="body1">
-            Due date: {new Date(task.due_date).toLocaleDateString()}
-          </Typography>
-          <Typography variant="body1">Category: {categoryName}</Typography>
-          <Typography variant="body1">Status: {statusName}</Typography>
-          <Dialog open={open} onClose={handleClose}>
-            <DialogContent>
-              <TaskEditForm
-                task={task}
-                handleClose={handleClose}
-                taskId={taskId}
-                onTaskUpdated={onTaskUpdated}
-              />
-            </DialogContent>
-          </Dialog>
-        </>
-      ) : (
-        <Typography>Loading...</Typography>
-      )}
-    </Box>
+    <Container component="main" maxWidth="md">
+      <Box sx={{ p: 2 }}>
+        {task && taskId ? (
+          <>
+            <Typography variant="h4" component="h2">
+              Title: {task['title']}
+              <IconButton
+                color="primary"
+                aria-label="edit task"
+                onClick={handleOpen}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton color="secondary" aria-label="delete task">
+                <DeleteIcon />
+              </IconButton>
+            </Typography>
+            <Typography variant="h6">
+              Description: {task.description}
+            </Typography>
+            <Typography variant="body1">
+              Due date: {new Date(task.due_date).toLocaleDateString()}
+            </Typography>
+            <Typography variant="body1">
+              Category: {task.category_name}
+            </Typography>
+            <Typography variant="body1">
+              Status: {task.taskstatus_name}
+            </Typography>
+            <Dialog open={open} onClose={handleClose}>
+              <DialogContent>
+                <TaskEditForm
+                  task={task}
+                  handleClose={handleClose}
+                  taskId={taskId}
+                  onTaskUpdated={onTaskUpdated}
+                />
+              </DialogContent>
+            </Dialog>
+          </>
+        ) : (
+          <Typography>Loading...</Typography>
+        )}
+      </Box>
+    </Container>
   );
 };
 
