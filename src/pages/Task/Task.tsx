@@ -119,28 +119,8 @@ export default function Tasks() {
             </DialogContent>
           </Dialog>
         </Box>
-        {/* タスクステータス作成 */}
-        <Button
-          variant="contained"
-          onClick={() => setTaskStatusFormOpen(true)}
-          fullWidth
-          sx={{ marginTop: 2 }}
-        >
-          タスクステータス作成
-        </Button>
-        <Dialog
-          open={taskStatusFormOpen}
-          onClose={() => setTaskStatusFormOpen(false)}
-        >
-          <DialogTitle>タスクステータス作成</DialogTitle>
-          <DialogContent>
-            <TaskStatusCreateForm
-              handleTaskStatusClose={() => setTaskStatusFormOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
 
-        <Container maxWidth="md" sx={{ mt: 10 }}>
+        <Container maxWidth="md">
           <TextField
             id="search"
             type="search"
