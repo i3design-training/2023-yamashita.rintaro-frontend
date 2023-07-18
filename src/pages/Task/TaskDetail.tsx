@@ -68,31 +68,35 @@ const TaskDetail = () => {
       <Box sx={{ p: 2 }}>
         {task && taskId ? (
           <>
-            <Typography variant="h4" component="h2">
-              Title: {task['title']}
-              <IconButton
-                color="primary"
-                aria-label="edit task"
-                onClick={handleOpen}
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton color="secondary" aria-label="delete task">
-                <DeleteIcon />
-              </IconButton>
-            </Typography>
-            <Typography variant="h6">
-              Description: {task.description}
+            <Box
+              sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}
+            >
+              <Typography variant="h4" component="h2">
+                {task['title']}
+              </Typography>
+              <Box>
+                <IconButton
+                  color="primary"
+                  aria-label="edit task"
+                  onClick={handleOpen}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton color="secondary" aria-label="delete task">
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Box>
+            <Typography variant="body1">
+              作成日時: {new Date(task.due_date).toLocaleDateString()}
             </Typography>
             <Typography variant="body1">
-              Due date: {new Date(task.due_date).toLocaleDateString()}
+              カテゴリー: {task.category_name}
             </Typography>
             <Typography variant="body1">
-              Category: {task.category_name}
+              ステータス: {task.taskstatus_name}
             </Typography>
-            <Typography variant="body1">
-              Status: {task.taskstatus_name}
-            </Typography>
+            <Typography variant="h6">{task.description}</Typography>
             <Dialog open={open} onClose={handleClose}>
               <DialogContent>
                 <TaskEditForm

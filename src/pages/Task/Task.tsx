@@ -2,7 +2,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   Checkbox,
   Box,
   Button,
@@ -11,18 +10,14 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
-  InputAdornment,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
-import CategoryCreateForm from '../../component/category/CategoryCreateForm';
-import TaskStatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
 import TaskCreateForm from '../../component/task/TaskCreateForm';
 import { Link } from 'react-router-dom';
 import { Dayjs } from 'dayjs';
+import SearchInput from '../../component/SearchInput/SearchInput';
 
 type Task = {
   id: string;
@@ -41,7 +36,6 @@ export default function Tasks() {
   const [, , userId] = useToken();
   const [filterVal, setFilterVal] = useState('');
   const [taskFormOpen, setTaskFormOpen] = useState(false);
-  const [taskStatusFormOpen, setTaskStatusFormOpen] = useState(false);
 
   const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
@@ -120,23 +114,8 @@ export default function Tasks() {
           </Dialog>
         </Box>
 
-        <Container maxWidth="md">
-          <TextField
-            id="search"
-            type="search"
-            label="Search"
-            defaultValue={''}
-            onChange={handleFilter}
-            InputProps={{
-              // TextFiledにアイコンなどの装飾をする
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Container>
+        {/* Search Bar */}
+        <SearchInput handleFilter={handleFilter} />
 
         {tasks.length > 0 ? (
           <List sx={{ width: '100%', marginTop: 3 }}>
@@ -156,9 +135,7 @@ export default function Tasks() {
                   id={`checkbox-list-label-${index}`}
                   primary={task.title}
                 />
-                <ListItemSecondaryAction>
-                  <Link to={`/tasks/${String(task.id)}`}>詳細</Link>
-                </ListItemSecondaryAction>
+                <Link to={`/tasks/${String(task.id)}`}>詳細</Link>
               </ListItem>
             ))}
           </List>
