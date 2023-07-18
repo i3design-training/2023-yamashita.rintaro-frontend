@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "lint": "eslint src && prettier --check src",
     "prepare": "husky install",
-    "eject": "rm -rf .git package-lock.json && npm pkg delete scripts.eject"
+    "eject": "rm -rf .git package-lock.json && npm pkg delete scripts.eject",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -24,6 +26,13 @@
     "react-router-dom": "^6.14.1"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "^7.0.27",
+    "@storybook/addon-interactions": "^7.0.27",
+    "@storybook/addon-links": "^7.0.27",
+    "@storybook/blocks": "^7.0.27",
+    "@storybook/react": "^7.0.27",
+    "@storybook/react-vite": "^7.0.27",
+    "@storybook/testing-library": "^0.0.14-next.2",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
@@ -35,9 +44,12 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-storybook": "^0.6.12",
     "husky": "^8.0.2",
     "lint-staged": "^13.0.4",
     "prettier": "^2.8.0",
+    "prop-types": "^15.8.1",
+    "storybook": "^7.0.27",
     "typescript": "^4.6.4",
     "vite": "^3.2.3"
   },
