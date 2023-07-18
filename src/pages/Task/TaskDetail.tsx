@@ -8,6 +8,9 @@ import {
   Dialog,
   DialogContent,
   Container,
+  Divider,
+  Tooltip,
+  Chip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -37,15 +40,11 @@ const TaskDetail = () => {
   };
 
   const onTaskUpdated = (updatedTask: Task) => {
-    // updatedTask: TaskEditFromのパラメータ
-    // setTaskに渡しても画面が更新されない
     setTask(updatedTask);
     console.log(updatedTask);
     handleClose();
   };
 
-  // TODO パフォーマンス改善
-  // setTaskが２回呼ばれているのおかしい
   useEffect(() => {
     const fetchTaskAndDetails = async () => {
       try {
@@ -56,12 +55,8 @@ const TaskDetail = () => {
         console.log('タスクを取得できませんでした', err);
       }
     };
-    // useEffectの中で定義した非同期関数を呼び出す際に、
-    // その結果を待たないか、エラーハンドリングをしないと、
-    // TypeScriptはそのPromiseが解決または拒否されるのを待つことができず、
-    // その結果アプリケーションが不安定な状態になる可能性があると警告する
     void fetchTaskAndDetails();
-  }, [taskId, task]); // TODO taskを外す。無限ループする
+  }, [taskId, task]);
 
   return (
     <Container component="main" maxWidth="md">
@@ -69,34 +64,65 @@ const TaskDetail = () => {
         {task && taskId ? (
           <>
             <Box
-              sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: 1,
+                borderColor: 'divider',
+                pb: 4,
+                mt: 8,
+              }}
             >
               <Typography variant="h4" component="h2">
                 {task['title']}
               </Typography>
               <Box>
-                <IconButton
-                  color="primary"
-                  aria-label="edit task"
-                  onClick={handleOpen}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton color="secondary" aria-label="delete task">
-                  <DeleteIcon />
-                </IconButton>
+                <Tooltip title="Edit Task">
+                  <IconButton color="primary" onClick={handleOpen}>
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Task">
+                  <IconButton color="secondary">
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Box>
-            <Typography variant="body1">
-              作成日時: {new Date(task.due_date).toLocaleDateString()}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mt: 2,
+              }}
+            >
+              <Typography variant="body1">
+                作成日時: {new Date(task.due_date).toLocaleDateString()}
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <Chip
+                  label={`カテゴリー: ${task.category_name}`}
+                  variant="outlined"
+                  color="primary"
+                />
+                <Chip
+                  label={`ステータス: ${task.taskstatus_name}`}
+                  variant="outlined"
+                  color="secondary"
+                />
+              </Box>
+            </Box>
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              {task.description}
             </Typography>
-            <Typography variant="body1">
-              カテゴリー: {task.category_name}
-            </Typography>
-            <Typography variant="body1">
-              ステータス: {task.taskstatus_name}
-            </Typography>
-            <Typography variant="h6">{task.description}</Typography>
             <Dialog open={open} onClose={handleClose}>
               <DialogContent>
                 <TaskEditForm
