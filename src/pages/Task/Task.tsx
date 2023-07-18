@@ -1,8 +1,5 @@
 import {
   List,
-  ListItem,
-  ListItemText,
-  Checkbox,
   Box,
   Button,
   Typography,
@@ -15,19 +12,9 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
 import TaskCreateForm from '../../component/task/TaskCreateForm';
-import { Link } from 'react-router-dom';
-import { Dayjs } from 'dayjs';
 import SearchInput from '../../component/SearchInput/SearchInput';
-
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  due_date: Dayjs;
-  category_id: string;
-  status_id: string;
-  user_id: string;
-};
+import { Task } from '../../types/task';
+import { TaskListItem } from '../../component/task/TaskListItem';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -70,7 +57,7 @@ export default function Tasks() {
     setFilterVal(e.target.value);
   };
 
-  const handleToggle = (value: number) => () => {
+  const handleToggleChecked = (value: number) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
 
@@ -120,23 +107,13 @@ export default function Tasks() {
         {tasks.length > 0 ? (
           <List sx={{ width: '100%', marginTop: 3 }}>
             {tasks.map((task, index) => (
-              <ListItem key={index} dense button>
-                <Checkbox
-                  edge="start"
-                  checked={checked.includes(index)}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{
-                    'aria-labelledby': `checkbox-list-label-${index}`,
-                  }}
-                  onClick={handleToggle(index)}
-                />
-                <ListItemText
-                  id={`checkbox-list-label-${index}`}
-                  primary={task.title}
-                />
-                <Link to={`/tasks/${String(task.id)}`}>詳細</Link>
-              </ListItem>
+              <TaskListItem
+                key={index}
+                task={task}
+                index={index}
+                checked={checked}
+                handleToggle={handleToggleChecked}
+              />
             ))}
           </List>
         ) : (
