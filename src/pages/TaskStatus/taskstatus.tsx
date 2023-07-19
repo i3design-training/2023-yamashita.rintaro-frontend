@@ -16,6 +16,7 @@ import {
 import { apiClient } from '../../config/axios';
 import StatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
 import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
+import CardItem from '../../component/cardItem/CardItem';
 
 type Status = {
   id: number;
@@ -66,17 +67,7 @@ const TaskStatuses: React.FC = () => {
           <Grid container spacing={3}>
             {statuses.map((status) => (
               <Grid item xs={12} sm={6} md={3} key={status.id}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      textAlign={'center'}
-                    >
-                      {status.name}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <CardItem name={status.name} />
               </Grid>
             ))}
           </Grid>

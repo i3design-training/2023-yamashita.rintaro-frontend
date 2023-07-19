@@ -6,17 +6,15 @@ import {
   Card,
   CardContent,
   Container,
-  CssBaseline,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  Box,
 } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import CategoryCreateForm from '../../component/category/CategoryCreateForm';
 import { Category } from '../../types/category';
 import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
+import CardItem from '../../component/cardItem/CardItem';
 
 const Categories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -62,17 +60,7 @@ const Categories: React.FC = () => {
           <Grid container spacing={3}>
             {categories.map((category) => (
               <Grid item xs={12} sm={6} md={3} key={category.id}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      textAlign={'center'}
-                    >
-                      {category.name}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <CardItem name={category.name} />
               </Grid>
             ))}
           </Grid>
