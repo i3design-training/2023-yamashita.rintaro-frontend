@@ -2,26 +2,16 @@ import React, { useEffect, useState } from 'react';
 import {
   CircularProgress,
   Grid,
-  Typography,
-  Card,
-  CardContent,
   Container,
-  CssBaseline,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  Box,
 } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import StatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
 import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
 import CardItem from '../../component/cardItem/CardItem';
-
-type Status = {
-  id: number;
-  name: string;
-};
+import { Status } from '../../types/status';
 
 const TaskStatuses: React.FC = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);

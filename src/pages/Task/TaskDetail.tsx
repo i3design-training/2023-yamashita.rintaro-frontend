@@ -14,11 +14,12 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TaskEditForm from '../../component/task/TaskEditForm';
+import { Dayjs } from 'dayjs';
 
 type TaskWithColumnName = {
   title: string;
   description: string;
-  due_date: string;
+  due_date: Dayjs;
   category_id: string;
   status_id: string;
   category_name: string;
@@ -76,19 +77,15 @@ const TaskDetail = () => {
               }}
             >
               <Typography variant="h4" component="h2">
-                {task['title']}
+                {task.title}
               </Typography>
               <Box>
-                <Tooltip title="Edit Task">
-                  <IconButton color="primary" onClick={handleOpen}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete Task">
-                  <IconButton color="secondary">
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
+                <IconButton color="primary" onClick={handleOpen}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton color="secondary">
+                  <DeleteIcon />
+                </IconButton>
               </Box>
             </Box>
             <Box
@@ -99,9 +96,7 @@ const TaskDetail = () => {
                 mt: 2,
               }}
             >
-              <Typography variant="body1">
-                期日: {new Date(task.due_date).toLocaleDateString()}
-              </Typography>
+              <Typography variant="body1">期日: {task.due_date}</Typography>
               <Box
                 sx={{
                   display: 'flex',
