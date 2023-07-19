@@ -16,7 +16,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TaskEditForm from '../../component/task/TaskEditForm';
 
-type Task = {
+type TaskWithColumnName = {
   title: string;
   description: string;
   due_date: string;
@@ -28,7 +28,7 @@ type Task = {
 
 const TaskDetail = () => {
   const { taskId } = useParams<{ taskId?: string }>();
-  const [task, setTask] = useState<Task | null>(null);
+  const [task, setTask] = useState<TaskWithColumnName | null>(null);
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -39,7 +39,7 @@ const TaskDetail = () => {
     setOpen(false);
   };
 
-  const onTaskUpdated = (updatedTask: Task) => {
+  const onTaskUpdated = (updatedTask: TaskWithColumnName) => {
     setTask(updatedTask);
     console.log(updatedTask);
     handleClose();
@@ -48,7 +48,9 @@ const TaskDetail = () => {
   useEffect(() => {
     const fetchTaskAndDetails = async () => {
       try {
-        const res = await apiClient.get<Task>(`/tasks/${String(taskId)}`);
+        const res = await apiClient.get<TaskWithColumnName>(
+          `/tasks/${String(taskId)}`,
+        );
         console.log(res.data);
         setTask(res.data);
       } catch (err) {

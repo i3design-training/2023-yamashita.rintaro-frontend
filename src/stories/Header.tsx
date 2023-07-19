@@ -1,230 +1,71 @@
-import { useEffect, useState } from 'react';
-import Toolbar from '@mui/material/Toolbar';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { apiClient } from '../config/axios';
-import { useToken } from '../context/TokenContext';
-import {
-  AppBar,
-  Avatar,
-  Box,
-  Container,
-  ListItemIcon,
-  Menu,
-  MenuItem,
-  Tooltip,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { Logout } from '@mui/icons-material';
+import React from 'react';
 
-type HeaderProps = {
-  sections: readonly {
-    title: string;
-    url: string;
-  }[];
-  title: string;
+import { Button } from './Button';
+import './header.css';
+
+type User = {
+  name: string;
 };
 
-export default function Header({ sections, title }: HeaderProps) {
-  const [isLogin, setIsLogin] = useState(false);
-  const [token, setToken, userId, setUserId, , setUserName] = useToken();
-  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
-  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      // 明示的にboolean型に変換
-      setIsLogin(!!token);
-    };
-
-    checkLoginStatus();
-  }, [token]);
-
-  const logout = async () => {
-    try {
-      await apiClient.post('/users/logout', { userId: userId });
-      localStorage.removeItem('token');
-      setIsLogin(false);
-      setToken('');
-      setUserId('');
-      setUserName('');
-      navigate('/login');
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  return (
-    <>
-      <AppBar position="static">
-        <Container maxWidth="xl">
-          <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Typography
-              component="h2"
-              variant="h5"
-              color="inherit"
-              noWrap
-              sx={{ flex: 1, display: { xs: 'none', md: 'flex' } }}
-            >
-              {title}
-            </Typography>
-            {isLogin ? (
-              <>
-                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                  {/* ハンバーガーメニュー */}
-                  <IconButton
-                    size="large"
-                    aria-label="account of current user"
-                    aria-controls="menu-appbar"
-                    aria-haspopup="true"
-                    onClick={handleOpenNavMenu}
-                    color="inherit"
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                  <Menu
-                    id="menu-appbar"
-                    anchorEl={anchorElNav}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'left',
-                    }}
-                    open={Boolean(anchorElNav)}
-                    onClose={handleCloseNavMenu}
-                    sx={{
-                      display: { xs: 'block', md: 'none' },
-                    }}
-                  >
-                    {sections.map((page) => (
-                      <MenuItem key={page.title} onClick={handleCloseNavMenu}>
-                        <Typography textAlign="center">{page.title}</Typography>
-                      </MenuItem>
-                    ))}
-                  </Menu>
-                </Box>
-
-                {/* ヘッダーナビ */}
-                <Box sx={{ flexGrow: 4, display: { xs: 'none', md: 'flex' } }}>
-                  {sections.map((page) => (
-                    <Button
-                      key={page.title}
-                      onClick={() => navigate(page.url)}
-                      sx={{ my: 2, color: 'white', display: 'block' }}
-                    >
-                      {page.title}
-                    </Button>
-                  ))}
-                </Box>
-
-                {/* プロフィールアイコン */}
-                <Box sx={{ flexGrow: 0 }}>
-                  <Tooltip title="Open settings">
-                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                      <Avatar />
-                    </IconButton>
-                  </Tooltip>
-                  <Menu
-                    sx={{ mt: '45px' }}
-                    id="menu-appbar"
-                    anchorEl={anchorElUser}
-                    open={Boolean(anchorElUser)}
-                    onClose={handleCloseUserMenu}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    PaperProps={{
-                      elevation: 0,
-                      sx: {
-                        overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                        mt: 1.5,
-                        '& .MuiAvatar-root': {
-                          width: 32,
-                          height: 32,
-                          ml: -0.5,
-                          mr: 1,
-                        },
-                        '&:before': {
-                          content: '""',
-                          display: 'block',
-                          position: 'absolute',
-                          top: 0,
-                          right: 14,
-                          width: 10,
-                          height: 10,
-                          bgcolor: 'background.paper',
-                          transform: 'translateY(-50%) rotate(45deg)',
-                          zIndex: 0,
-                        },
-                      },
-                    }}
-                  >
-                    {/* プロフィールアイコンクリック時に出るメニュー */}
-                    <MenuItem onClick={() => navigate('profile')}>
-                      <Avatar /> Profile{' '}
-                    </MenuItem>
-                    <MenuItem onClick={() => logout()}>
-                      <ListItemIcon>
-                        <Logout fontSize="small" />
-                      </ListItemIcon>
-                      {'Logout'}
-                    </MenuItem>
-                  </Menu>
-                </Box>
-              </>
-            ) : (
-              <>
-                {/* 未ログイン時 */}
-                <Button
-                  color="inherit"
-                  size="small"
-                  onClick={() => navigate('/login')}
-                >
-                  ログイン
-                </Button>
-                <Button
-                  color="inherit"
-                  size="small"
-                  onClick={() => navigate('/registration')}
-                >
-                  新規登録
-                </Button>
-              </>
-            )}
-          </Toolbar>
-        </Container>
-      </AppBar>
-      <Outlet />
-    </>
-  );
+interface HeaderProps {
+  user?: User;
+  onLogin: () => void;
+  onLogout: () => void;
+  onCreateAccount: () => void;
 }
+
+export const Header = ({
+  user,
+  onLogin,
+  onLogout,
+  onCreateAccount,
+}: HeaderProps) => (
+  <header>
+    <div className="storybook-header">
+      <div>
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g fill="none" fillRule="evenodd">
+            <path
+              d="M10 0h12a10 10 0 0110 10v12a10 10 0 01-10 10H10A10 10 0 010 22V10A10 10 0 0110 0z"
+              fill="#FFF"
+            />
+            <path
+              d="M5.3 10.6l10.4 6v11.1l-10.4-6v-11zm11.4-6.2l9.7 5.5-9.7 5.6V4.4z"
+              fill="#555AB9"
+            />
+            <path
+              d="M27.2 10.6v11.2l-10.5 6V16.5l10.5-6zM15.7 4.4v11L6 10l9.7-5.5z"
+              fill="#91BAF8"
+            />
+          </g>
+        </svg>
+        <h1>Acme</h1>
+      </div>
+      <div>
+        {user ? (
+          <>
+            <span className="welcome">
+              Welcome, <b>{user.name}</b>!
+            </span>
+            <Button size="small" onClick={onLogout} label="Log out" />
+          </>
+        ) : (
+          <>
+            <Button size="small" onClick={onLogin} label="Log in" />
+            <Button
+              primary
+              size="small"
+              onClick={onCreateAccount}
+              label="Sign up"
+            />
+          </>
+        )}
+      </div>
+    </div>
+  </header>
+);

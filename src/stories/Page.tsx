@@ -1,30 +1,23 @@
 import React from 'react';
 
-import Header from './Header';
+import { Header } from './Header';
 import './page.css';
 
-export const Page: React.FC = () => {
-  const ROUTES = {
-    HOME: '/',
-    LOGIN: '/login',
-    PROFILE: '/profile',
-    REGISTRATION: '/registration',
-    REGISTRATION_COMPLETE: '/registrationComplete',
-    TASKS: '/tasks',
-    TASK_DETAIL: '/tasks/:taskId', // const { taskId } = useParams(); in TaskDetail.tsx
-    TASKSTATUS: '/taskstatus',
-    CATEGORIES: '/categories',
-  };
+type User = {
+  name: string;
+};
 
-  const sections = [
-    { title: 'Task', url: ROUTES.TASKS },
-    { title: 'Category', url: ROUTES.CATEGORIES },
-    { title: 'TaskStatus', url: ROUTES.TASKSTATUS },
-  ];
+export const Page: React.FC = () => {
+  const [user, setUser] = React.useState<User>();
 
   return (
     <article>
-      <Header sections={sections} title="TODO" />
+      <Header
+        user={user}
+        onLogin={() => setUser({ name: 'Jane Doe' })}
+        onLogout={() => setUser(undefined)}
+        onCreateAccount={() => setUser({ name: 'Jane Doe' })}
+      />
 
       <section className="storybook-page">
         <h2>Pages in Storybook</h2>
