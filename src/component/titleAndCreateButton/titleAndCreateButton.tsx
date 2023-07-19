@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Typography, Button, Box } from '@mui/material';
 
-type TitleAndCreateButtonProps = {
+export type TitleAndCreateButtonProps = {
   titleText: string;
   onButtonClick: () => void;
 };
