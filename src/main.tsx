@@ -1,56 +1,56 @@
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Tasks from './pages/Task/Task';
+import { TokenProvider } from './context/TokenContext';
+import './index.css';
+import { Header } from './layout/Header';
+import Categories from './pages/Category/categories';
 import Login from './pages/Login/Login';
 import Registration from './pages/Registration/Registration';
-import Header from './layout/Header';
-import Categories from './pages/Category/categories';
 import RegistrationComplete from './pages/Registration/RegistrationComplete';
-import { TokenProvider } from './context/TokenContext';
-import { AuthRoute } from './routes/AuthRoute';
-import { Profiler, StrictMode } from 'react';
+import Tasks from './pages/Task/Task';
 import TaskDetail from './pages/Task/TaskDetail';
-import UserProfile from './pages/User/profile';
 import TaskStatuses from './pages/TaskStatus/taskstatus';
+import UserProfile from './pages/User/profile';
+import { AuthRoute } from './routes/AuthRoute';
 
-const ROUTES = {
-  HOME: '/',
-  LOGIN: '/login',
-  PROFILE: '/profile',
-  REGISTRATION: '/registration',
-  REGISTRATION_COMPLETE: '/registrationComplete',
-  TASKS: '/tasks',
-  TASK_DETAIL: '/tasks/:taskId', // const { taskId } = useParams(); in TaskDetail.tsx
-  TASKSTATUS: '/taskstatus',
-  CATEGORIES: '/categories',
+const routes = {
+  home: '/',
+  login: '/login',
+  profile: '/profile',
+  registration: '/registration',
+  registrationComplete: '/registrationComplete',
+  tasks: '/tasks',
+  taskDetail: '/tasks/:taskId',
+  taskstatus: '/taskstatus',
+  categories: '/categories',
 };
 
 const sections = [
-  { title: 'Task', url: ROUTES.TASKS },
-  { title: 'Category', url: ROUTES.CATEGORIES },
-  { title: 'TaskStatus', url: ROUTES.TASKSTATUS },
+  { title: 'Task', url: routes.tasks },
+  { title: 'Category', url: routes.categories },
+  { title: 'TaskStatus', url: routes.taskstatus },
 ];
 
 const router = createBrowserRouter([
   {
-    path: ROUTES.HOME,
+    path: routes.home,
     element: <Header title="TODO" sections={sections} />,
     children: [
       {
-        path: ROUTES.LOGIN,
+        path: routes.login,
         element: <Login />,
       },
       {
-        path: ROUTES.REGISTRATION,
+        path: routes.registration,
         element: <Registration />,
       },
       {
-        path: ROUTES.REGISTRATION_COMPLETE,
+        path: routes.registrationComplete,
         element: <RegistrationComplete />,
       },
       {
-        path: ROUTES.TASKS,
+        path: routes.tasks,
         element: (
           <AuthRoute>
             <Tasks />
@@ -58,7 +58,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: ROUTES.TASK_DETAIL,
+        path: routes.taskDetail,
         element: (
           <AuthRoute>
             <TaskDetail />
@@ -66,15 +66,15 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: ROUTES.PROFILE,
+        path: routes.profile,
         element: <UserProfile />,
       },
       {
-        path: ROUTES.CATEGORIES,
+        path: routes.categories,
         element: <Categories />,
       },
       {
-        path: ROUTES.TASKSTATUS,
+        path: routes.taskstatus,
         element: <TaskStatuses />,
       },
     ],

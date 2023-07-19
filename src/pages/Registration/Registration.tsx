@@ -1,20 +1,20 @@
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
+import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { apiClient } from '../../config/axios';
 
 const defaultTheme = createTheme();
 
-export default function Registration() {
+const Registration = () => {
   const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,14 +36,6 @@ export default function Registration() {
     }
   };
 
-  // React.Dispatch: 新しいstateの値を受け取り、それに基づいてstateを更新
-  // React.SetStateAction: 関数形式のstate更新または直接のstate更新のどちらも許可する型
-  // 例）usernameが記入されたら
-  //    1. ユーザがテキストフィールドに何かを入力すると、onChangeイベントが発火
-  //    2. onChangeイベントが発火したとき、`handleInputChange`関数から返された以下の関数が呼び出される
-  //        (event: React.ChangeEvent<HTMLInputElement>) => {
-  //          setUserName(event.target.value);
-  //        };
   const handleInputChange =
     (setState: React.Dispatch<React.SetStateAction<string>>) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,4 +130,6 @@ export default function Registration() {
       </Container>
     </ThemeProvider>
   );
-}
+};
+
+export default Registration;

@@ -18,3 +18,5 @@ export const CardItem: FC<CardProps> = ({ name }) => {
     </>
   );
 };
+
+// export default CardItem;

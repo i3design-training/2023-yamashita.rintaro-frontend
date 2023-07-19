@@ -1,11 +1,5 @@
-import { useEffect, useState } from 'react';
-import Toolbar from '@mui/material/Toolbar';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { apiClient } from '../config/axios';
-import { useToken } from '../context/TokenContext';
+import { Logout } from '@mui/icons-material';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Avatar,
@@ -16,8 +10,14 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { Logout } from '@mui/icons-material';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { apiClient } from '../config/axios';
+import { useToken } from '../context/TokenContext';
 
 type HeaderProps = {
   sections: readonly {
@@ -27,7 +27,7 @@ type HeaderProps = {
   title: string;
 };
 
-export default function Header({ sections, title }: HeaderProps) {
+export const Header = ({ sections, title }: HeaderProps) => {
   const [isLogin, setIsLogin] = useState(false);
   const [token, setToken, userId, setUserId, , setUserName] = useToken();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -197,7 +197,7 @@ export default function Header({ sections, title }: HeaderProps) {
                       <ListItemIcon>
                         <Logout fontSize="small" />
                       </ListItemIcon>
-                      {'Logout'}
+                      Logout
                     </MenuItem>
                   </Menu>
                 </Box>
@@ -227,4 +227,4 @@ export default function Header({ sections, title }: HeaderProps) {
       <Outlet />
     </>
   );
-}
+};

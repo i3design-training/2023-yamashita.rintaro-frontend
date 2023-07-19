@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
 import {
   CircularProgress,
-  Grid,
   Container,
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
+  Grid,
 } from '@mui/material';
-import { apiClient } from '../../config/axios';
+import React, { useEffect, useState } from 'react';
+import { CardItem } from '../../component/cardItem/CardItem';
 import StatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
 import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
-import CardItem from '../../component/cardItem/CardItem';
+import { apiClient } from '../../config/axios';
 import { Status } from '../../types/status';
 
 const TaskStatuses: React.FC = () => {

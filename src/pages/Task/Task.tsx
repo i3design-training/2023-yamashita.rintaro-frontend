@@ -1,21 +1,21 @@
 import {
-  List,
-  Typography,
   Container,
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
+  List,
+  Typography,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { apiClient } from '../../config/axios';
-import { useToken } from '../../context/TokenContext';
-import TaskCreateForm from '../../component/task/TaskCreateForm';
+import { useEffect, useState } from 'react';
 import SearchInput from '../../component/SearchInput/SearchInput';
-import { Task } from '../../types/task';
+import TaskCreateForm from '../../component/task/TaskCreateForm';
 import { TaskListItem } from '../../component/task/TaskListItem';
 import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
+import { apiClient } from '../../config/axios';
+import { useToken } from '../../context/TokenContext';
+import { Task } from '../../types/task';
 
-export default function Tasks() {
+const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [originalTasks, setOriginalTasks] = useState<Task[]>([]); // 追加
   const [checked, setChecked] = useState<number[]>([]);
@@ -107,4 +107,6 @@ export default function Tasks() {
       )}
     </Container>
   );
-}
+};
+
+export default Tasks;
