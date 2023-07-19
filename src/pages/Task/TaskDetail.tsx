@@ -8,7 +8,6 @@ import {
   Dialog,
   DialogContent,
   Container,
-  Divider,
   Tooltip,
   Chip,
 } from '@mui/material';
@@ -101,7 +100,7 @@ const TaskDetail = () => {
               }}
             >
               <Typography variant="body1">
-                作成日時: {new Date(task.due_date).toLocaleDateString()}
+                期日: {new Date(task.due_date).toLocaleDateString()}
               </Typography>
               <Box
                 sx={{
