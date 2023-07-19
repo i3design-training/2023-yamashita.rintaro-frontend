@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
 import {
   CircularProgress,
-  Grid,
   Container,
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
+  Grid,
 } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { CardItem } from '../../component/cardItem/CardItem';
+import { TaskStatusCreateForm } from '../../component/taskstatus/TaskStatusCreateForm';
+import { TitleAndCreateButton } from '../../component/titleAndCreateButton/titleAndCreateButton';
 import { apiClient } from '../../config/axios';
-import StatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
-import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
-import CardItem from '../../component/cardItem/CardItem';
 import { Status } from '../../types/status';
 
 const TaskStatuses: React.FC = () => {
@@ -49,7 +49,7 @@ const TaskStatuses: React.FC = () => {
           >
             <DialogTitle>ステータス作成</DialogTitle>
             <DialogContent>
-              <StatusCreateForm
+              <TaskStatusCreateForm
                 handleTaskStatusClose={() => setStatusFormOpen(false)}
               />
             </DialogContent>

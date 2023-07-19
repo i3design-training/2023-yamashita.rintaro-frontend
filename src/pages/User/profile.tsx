@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
 
@@ -10,7 +10,7 @@ type User = {
 
 const UserProfile = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [, , userId, , username, setUserName] = useToken();
+  const [, , , , username, setUserName] = useToken();
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 

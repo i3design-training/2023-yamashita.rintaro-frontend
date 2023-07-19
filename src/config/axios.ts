@@ -1,9 +1,9 @@
 import axiosBase from 'axios';
 
-const BASEURL = import.meta.env.VITE_BASE_URL as string;
+const base_url = import.meta.env.VITE_BASE_URL as string;
 
 export const apiClient = axiosBase.create({
-  baseURL: BASEURL,
+  baseURL: base_url,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,7 +17,7 @@ export const apiClient = axiosBase.create({
 //    timeout: リクエストがタイムアウトするまでのミリ秒
 //    params: リクエストパラメータを含むオブジェクト
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token') || '';
+  const token = localStorage.getItem('token') ?? '';
   config.headers.Authorization = `Bearer ${token}`;
   return config;
 });

@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
 import {
   CircularProgress,
-  Grid,
   Container,
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
+  Grid,
 } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { CardItem } from '../../component/cardItem/CardItem';
+import { CategoryCreateForm } from '../../component/category/CategoryCreateForm';
+import { TitleAndCreateButton } from '../../component/titleAndCreateButton/titleAndCreateButton';
 import { apiClient } from '../../config/axios';
-import CategoryCreateForm from '../../component/category/CategoryCreateForm';
 import { Category } from '../../types/category';
-import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
-import CardItem from '../../component/cardItem/CardItem';
 
 const Categories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);

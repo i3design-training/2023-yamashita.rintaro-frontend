@@ -1,40 +1,134 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/strict",
+    "plugin:eslint-comments/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:storybook/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"],
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:@typescript-eslint/strict",
-        "plugin:eslint-comments/recommended",
-        "plugin:react/recommended",
-        "plugin:react/jsx-runtime",
-        "plugin:react-hooks/recommended",
-        "prettier"
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint", "filename-consistency", "react"],
+  "rules": {
+    "react/function-component-definition": [
+      "error",
+      {
+        "namedComponents": "arrow-function"
+      }
     ],
-    "overrides": [
+    "react/jsx-boolean-value": "error",
+    "react/jsx-curly-brace-presence": "error",
+    "react/jsx-pascal-case": "error",
+    "react/self-closing-comp": "error",
+    "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": ["variable", "method", "accessor", "property"],
+        "format": ["camelCase", "snake_case"]
+      },
+      {
+        "selector": "variable",
+        "modifiers": ["exported", "const"],
+        "format": ["PascalCase", "strictCamelCase"]
+      },
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": false
+        }
+      },
+      {
+        "selector": ["class", "typeAlias", "enum"],
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": ["objectLiteralProperty"],
+        "format": null,
+        "modifiers": ["requiresQuotes"]
+      }
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "project": ["./tsconfig.json"],
-        "ecmaVersion": "latest",
-        "sourceType": "module"
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": {
+          "arguments": false,
+          "attributes": false,
+          "properties": false
+        }
+      }
+    ],
+    "@typescript-eslint/no-unnecessary-condition": "off",
+    "eslint-comments/require-description": "error",
+    "eslint-comments/disable-enable-pair": [
+      "error",
+      { "allowWholeFile": true }
+    ],
+    "import/no-default-export": "error",
+    "no-magic-numbers": [
+      "error",
+      {
+        "ignore": [-1, 0, 1],
+        "ignoreDefaultValues": true,
+        "ignoreArrayIndexes": true,
+        "enforceConst": true
+      }
+    ]
+  },
+  "ignorePatterns": [".eslintrc.js", ".eslintrc.v2.js", "src/types/api.ts"],
+  "overrides": [
+    {
+      "files": ["*/pages/**/**.tsx"],
+      "rules": {
+        "import/no-default-export": "off",
+        "import/prefer-default-export": "error",
+        "filename-rules/match": "off",
+        "filename-consistency/match": "off"
+      }
     },
-    "plugins": [
-        "react",
-        "@typescript-eslint"
-    ],
-    "rules": {
-        // see: https://typescript-eslint.io/rules/
-        "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
-        "@typescript-eslint/no-misused-promises": [
-            "error",
-            { "checksVoidReturn": { "arguments": false, "attributes": false } }
-        ],
-        // see: https://mysticatea.github.io/eslint-plugin-eslint-comments/rules/
-        "eslint-comments/require-description": ["error"],
-        "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }]
+    {
+      "files": ["*/types/**/**.ts"],
+      "rules": {
+        "no-magic-numbers": "off"
+      }
+    },
+    {
+      "files": ["src/utils/KTX2Loader.js"],
+      "rules": {
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": ["__tests__/**/*.ts", "__tests__/**/*.tsx"],
+      "rules": {
+        "no-magic-numbers": "off",
+        "filename-consistency/match": "off"
+      }
+    },
+    {
+      "files": ["*/**/**.stories.tsx"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
     }
+  ]
 }

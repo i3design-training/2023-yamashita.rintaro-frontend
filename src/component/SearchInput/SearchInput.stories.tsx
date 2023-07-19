@@ -1,14 +1,14 @@
 import { action } from '@storybook/addon-actions';
-import SearchInput from './SearchInput';
+import { StoryFn } from '@storybook/react';
+import { SearchInput, SearchInputProps } from './SearchInput';
 
 export default {
   title: 'Components/SearchInput',
   component: SearchInput,
 };
 
-const Template = (args) => <SearchInput {...args} />;
-
-export const Default = Template.bind({});
+const template: StoryFn<SearchInputProps> = (args) => <SearchInput {...args} />;
+export const Default = template.bind({});
 Default.args = {
   // テキストフィールドへの入力時、そのアクションをStorybookのアクションロガーに表示
   handleFilter: action('Filtered'),

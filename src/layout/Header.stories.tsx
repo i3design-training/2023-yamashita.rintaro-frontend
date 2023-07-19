@@ -1,21 +1,16 @@
-import React from 'react';
-import Header from './Header';
+import { StoryFn } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
+import { Header, HeaderProps } from './Header';
 
-export default {
-  title: 'Components/Header',
-  component: Header,
-};
+export default { title: 'Components/Header', component: Header };
 
-// routerで囲わないとuseNavigateが使えない
-// MemoryRouterの子要素にすることでエラーを回避できる
-const Template = (args) => (
+const template: StoryFn<HeaderProps> = (args) => (
   <MemoryRouter>
     <Header {...args} />
   </MemoryRouter>
 );
 
-export const Default = Template.bind({});
+export const Default = template.bind({});
 Default.args = {
   sections: [
     { title: 'Section 1', url: '/section1' },
@@ -25,7 +20,7 @@ Default.args = {
   title: 'My Header',
 };
 
-export const LoggedOut = Template.bind({});
+export const LoggedOut = template.bind({});
 LoggedOut.args = {
   sections: [],
   title: 'My Header',

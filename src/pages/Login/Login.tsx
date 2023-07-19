@@ -1,21 +1,21 @@
-import { FormEvent, useState } from 'react';
-import { useToken } from '../../context/TokenContext';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { apiClient } from '../../config/axios';
+import CssBaseline from '@mui/material/CssBaseline';
+import Link from '@mui/material/Link';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '../../config/axios';
+import { useToken } from '../../context/TokenContext';
 
 const defaultTheme = createTheme();
 
-export default function SignIn() {
+const SignIn = () => {
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
   const [token, setToken, userId, setUserId, userName, setUserName] =
@@ -105,11 +105,13 @@ export default function SignIn() {
               ログイン
             </Button>
             <Link href="#" variant="body2">
-              {'新規登録はこちら'}
+              新規登録はこちら
             </Link>
           </Box>
         </Box>
       </Container>
     </ThemeProvider>
   );
-}
+};
+
+export default SignIn;
