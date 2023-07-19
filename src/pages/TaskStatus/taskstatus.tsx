@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import StatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
+import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
 
 type Status = {
   id: number;
@@ -47,30 +48,21 @@ const TaskStatuses: React.FC = () => {
         <CircularProgress />
       ) : (
         <Container component="main" maxWidth="md">
-          <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
-            <Typography variant="h3" textAlign={'center'}>
-              Status
-            </Typography>
-            {/* ステータス作成 */}
-            <Button
-              variant="contained"
-              onClick={() => setStatusFormOpen(true)}
-              sx={{ marginTop: 2 }}
-            >
-              ステータス作成
-            </Button>
-            <Dialog
-              open={statusFormOpen}
-              onClose={() => setStatusFormOpen(false)}
-            >
-              <DialogTitle>ステータス作成</DialogTitle>
-              <DialogContent>
-                <StatusCreateForm
-                  handleTaskStatusClose={() => setStatusFormOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
-          </Box>
+          <TitleAndCreateButton
+            titleText="ステータス"
+            onButtonClick={() => setStatusFormOpen(true)}
+          />
+          <Dialog
+            open={statusFormOpen}
+            onClose={() => setStatusFormOpen(false)}
+          >
+            <DialogTitle>ステータス作成</DialogTitle>
+            <DialogContent>
+              <StatusCreateForm
+                handleTaskStatusClose={() => setStatusFormOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
           <Grid container spacing={3}>
             {statuses.map((status) => (
               <Grid item xs={12} sm={6} md={3} key={status.id}>

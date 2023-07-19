@@ -15,11 +15,8 @@ import {
 } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import CategoryCreateForm from '../../component/category/CategoryCreateForm';
-
-type Category = {
-  id: number;
-  name: string;
-};
+import { Category } from '../../types/category';
+import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
 
 const Categories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -47,30 +44,21 @@ const Categories: React.FC = () => {
         <CircularProgress />
       ) : (
         <Container component="main" maxWidth="md">
-          <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
-            <Typography variant="h3" textAlign={'center'}>
-              Category
-            </Typography>
-            {/* カテゴリー作成 */}
-            <Button
-              variant="contained"
-              onClick={() => setCategoryFormOpen(true)}
-              sx={{ marginTop: 2 }}
-            >
-              カテゴリ作成
-            </Button>
-            <Dialog
-              open={categoryFormOpen}
-              onClose={() => setCategoryFormOpen(false)}
-            >
-              <DialogTitle>カテゴリ作成</DialogTitle>
-              <DialogContent>
-                <CategoryCreateForm
-                  handleCategoryClose={() => setCategoryFormOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
-          </Box>
+          <TitleAndCreateButton
+            titleText="カテゴリ"
+            onButtonClick={() => setCategoryFormOpen(true)}
+          />
+          <Dialog
+            open={categoryFormOpen}
+            onClose={() => setCategoryFormOpen(false)}
+          >
+            <DialogTitle>カテゴリ作成</DialogTitle>
+            <DialogContent>
+              <CategoryCreateForm
+                handleCategoryClose={() => setCategoryFormOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
           <Grid container spacing={3}>
             {categories.map((category) => (
               <Grid item xs={12} sm={6} md={3} key={category.id}>

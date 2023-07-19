@@ -15,6 +15,7 @@ import TaskCreateForm from '../../component/task/TaskCreateForm';
 import SearchInput from '../../component/SearchInput/SearchInput';
 import { Task } from '../../types/task';
 import { TaskListItem } from '../../component/task/TaskListItem';
+import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -72,56 +73,40 @@ export default function Tasks() {
 
   return (
     <Container component="main" maxWidth="md">
-      <Box
-        sx={{
-          my: 3,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
-          <Typography variant="h3">TODOリスト</Typography>
+      <TitleAndCreateButton
+        titleText="タスク"
+        onButtonClick={() => setTaskFormOpen(true)}
+      />
+      <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
+        <DialogTitle>タスクを作成</DialogTitle>
+        <DialogContent>
+          <TaskCreateForm
+            onTaskCreated={handleNewTask}
+            onClose={() => setTaskFormOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
-          {/* タスク作成 */}
-          <Button
-            variant="contained"
-            onClick={() => setTaskFormOpen(true)}
-            sx={{ marginTop: 2 }}
-          >
-            新規タスク
-          </Button>
-          <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
-            <DialogTitle>新規タスクを作成</DialogTitle>
-            <DialogContent>
-              <TaskCreateForm
-                onTaskCreated={handleNewTask}
-                onClose={() => setTaskFormOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        </Box>
+      {/* Search Bar */}
+      <SearchInput handleFilter={handleFilter} />
 
-        {/* Search Bar */}
-        <SearchInput handleFilter={handleFilter} />
-
-        {tasks.length > 0 ? (
-          <List sx={{ width: '100%', marginTop: 3 }}>
-            {tasks.map((task, index) => (
-              <TaskListItem
-                key={index}
-                task={task}
-                index={index}
-                checked={checked}
-                handleToggle={handleToggleChecked}
-              />
-            ))}
-          </List>
-        ) : (
-          <Typography variant="h6" component="h3" sx={{ marginTop: 3 }}>
-            タスクがありません
-          </Typography>
-        )}
-      </Box>
+      {tasks.length > 0 ? (
+        <List sx={{ width: '100%', marginTop: 3 }}>
+          {tasks.map((task, index) => (
+            <TaskListItem
+              key={index}
+              task={task}
+              index={index}
+              checked={checked}
+              handleToggle={handleToggleChecked}
+            />
+          ))}
+        </List>
+      ) : (
+        <Typography variant="h6" component="h3" sx={{ marginTop: 3 }}>
+          タスクがありません
+        </Typography>
+      )}
     </Container>
   );
 }
