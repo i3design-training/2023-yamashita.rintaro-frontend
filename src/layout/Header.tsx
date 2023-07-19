@@ -1,10 +1,8 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { apiClient } from '../config/axios';
 import { useToken } from '../context/TokenContext';
@@ -32,7 +30,6 @@ type HeaderProps = {
 export default function Header({ sections, title }: HeaderProps) {
   const [isLogin, setIsLogin] = useState(false);
   const [token, setToken, userId, setUserId, , setUserName] = useToken();
-  const userName = localStorage.getItem('userName') || '';
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 

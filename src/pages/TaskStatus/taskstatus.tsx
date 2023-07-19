@@ -2,24 +2,16 @@ import React, { useEffect, useState } from 'react';
 import {
   CircularProgress,
   Grid,
-  Typography,
-  Card,
-  CardContent,
   Container,
-  CssBaseline,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  Box,
 } from '@mui/material';
 import { apiClient } from '../../config/axios';
 import StatusCreateForm from '../../component/taskstatus/TaskStatusCreateForm';
-
-type Status = {
-  id: number;
-  name: string;
-};
+import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
+import CardItem from '../../component/cardItem/CardItem';
+import { Status } from '../../types/status';
 
 const TaskStatuses: React.FC = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);
@@ -47,44 +39,25 @@ const TaskStatuses: React.FC = () => {
         <CircularProgress />
       ) : (
         <Container component="main" maxWidth="md">
-          <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
-            <Typography variant="h3" textAlign={'center'}>
-              Status
-            </Typography>
-            {/* ステータス作成 */}
-            <Button
-              variant="contained"
-              onClick={() => setStatusFormOpen(true)}
-              sx={{ marginTop: 2 }}
-            >
-              ステータス作成
-            </Button>
-            <Dialog
-              open={statusFormOpen}
-              onClose={() => setStatusFormOpen(false)}
-            >
-              <DialogTitle>ステータス作成</DialogTitle>
-              <DialogContent>
-                <StatusCreateForm
-                  handleTaskStatusClose={() => setStatusFormOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
-          </Box>
+          <TitleAndCreateButton
+            titleText="ステータス"
+            onButtonClick={() => setStatusFormOpen(true)}
+          />
+          <Dialog
+            open={statusFormOpen}
+            onClose={() => setStatusFormOpen(false)}
+          >
+            <DialogTitle>ステータス作成</DialogTitle>
+            <DialogContent>
+              <StatusCreateForm
+                handleTaskStatusClose={() => setStatusFormOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
           <Grid container spacing={3}>
             {statuses.map((status) => (
               <Grid item xs={12} sm={6} md={3} key={status.id}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      textAlign={'center'}
-                    >
-                      {status.name}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <CardItem name={status.name} />
               </Grid>
             ))}
           </Grid>

@@ -1,11 +1,17 @@
 import { FC, ChangeEvent, FormEvent, useState, useEffect } from 'react';
 import { Box, Button, TextField, MenuItem } from '@mui/material';
 import { apiClient } from '../../config/axios';
+import dayjs, { Dayjs } from 'dayjs';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { Category } from '../../types/category';
+import { Status } from '../../types/status';
 
 type Task = {
   title: string;
   description: string;
-  due_date: string;
+  due_date: Dayjs;
   category_id: string;
   status_id: string;
 };
@@ -13,28 +19,17 @@ type Task = {
 type TaskWithCategoryNameStatusName = {
   title: string;
   description: string;
-  due_date: string;
+  due_date: Dayjs;
   category_id: string;
   status_id: string;
   category_name: string;
   taskstatus_name: string;
 };
 
-type Category = {
-  id: string;
-  name: string;
-};
-
-type Status = {
-  id: string;
-  name: string;
-};
-
-// フォームコンポーネントが受け取るプロパティの型を定義
 type TaskEditFormProps = {
   task: Task;
-  onTaskUpdated: (task: Task) => void; // タスクが更新された後に呼び出す関数
-  handleClose: () => void; // フォームが閉じられる時に呼び出す関数
+  onTaskUpdated: (task: Task) => void;
+  handleClose: () => void;
   taskId: string;
 };
 
@@ -44,29 +39,31 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
   handleClose,
   taskId,
 }) => {
-  const [formData, setFormData] = useState<Task>(task);
+  const [formData, setFormData] = useState<Task>({
+    ...task,
+    due_date: dayjs(task.due_date),
+  });
   const [categories, setCategories] = useState<Category[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
 
   useEffect(() => {
-    // TODO Joinテーブルでcategory.nameとtaskstatus.nameを一緒に返す
-    apiClient
-      .get<Category[]>('/categories')
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.error('カテゴリー取得できませんでした: ', error);
-      });
+    const fetchCategoriesAndStatuses = async () => {
+      try {
+        const [categoryResponse, statusResponse] = await Promise.all([
+          apiClient.get<Category[]>('/categories'),
+          apiClient.get<Status[]>('/taskstatus'),
+        ]);
 
-    apiClient
-      .get<Status[]>('/taskstatus')
-      .then((response) => {
-        setStatuses(response.data);
-      })
-      .catch((error) => {
-        console.error('ステータス取得できませんでした: ', error);
-      });
+        setCategories(categoryResponse.data);
+        setStatuses(statusResponse.data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error('データ取得できませんでした: ', error.message);
+        }
+      }
+    };
+
+    void fetchCategoriesAndStatuses();
   }, []);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -82,14 +79,23 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
     try {
       const res = await apiClient.put<Task>(`/tasks/${taskId}`, {
         ...formData,
+        due_date: formData.due_date,
       } as TaskWithCategoryNameStatusName);
-      console.log(res.data);
       onTaskUpdated(res.data);
       handleClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(`Error while updating task: ${err.message}`);
       }
+    }
+  };
+
+  const handleDateChange = (date: Dayjs | null) => {
+    if (date) {
+      setFormData((prevState) => ({
+        ...prevState,
+        due_date: date,
+      }));
     }
   };
 
@@ -131,15 +137,11 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
         fullWidth
         sx={{ marginBottom: 2 }}
       />
-      <TextField
-        name="due_date"
-        label="期日"
-        variant="outlined"
-        value={due_date}
-        onChange={handleInputChange}
-        fullWidth
-        sx={{ marginBottom: 2 }}
-      />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DemoContainer components={['DatePicker']}>
+          <DatePicker value={due_date} onChange={handleDateChange} />
+        </DemoContainer>
+      </LocalizationProvider>
       <TextField
         select
         name="status_id"
@@ -156,11 +158,8 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
           </MenuItem>
         ))}
       </TextField>
-      <Button variant="contained" type="submit" fullWidth>
-        更新
-      </Button>
-      <Button variant="text" onClick={handleClose} fullWidth>
-        キャンセル
+      <Button type="submit" variant="contained" fullWidth>
+        編集する
       </Button>
     </Box>
   );

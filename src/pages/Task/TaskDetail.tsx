@@ -8,15 +8,18 @@ import {
   Dialog,
   DialogContent,
   Container,
+  Tooltip,
+  Chip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TaskEditForm from '../../component/task/TaskEditForm';
+import { Dayjs } from 'dayjs';
 
-type Task = {
+type TaskWithColumnName = {
   title: string;
   description: string;
-  due_date: string;
+  due_date: Dayjs;
   category_id: string;
   status_id: string;
   category_name: string;
@@ -25,7 +28,7 @@ type Task = {
 
 const TaskDetail = () => {
   const { taskId } = useParams<{ taskId?: string }>();
-  const [task, setTask] = useState<Task | null>(null);
+  const [task, setTask] = useState<TaskWithColumnName | null>(null);
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -36,62 +39,85 @@ const TaskDetail = () => {
     setOpen(false);
   };
 
-  const onTaskUpdated = (updatedTask: Task) => {
-    // updatedTask: TaskEditFromのパラメータ
-    // setTaskに渡しても画面が更新されない
+  const onTaskUpdated = (updatedTask: TaskWithColumnName) => {
     setTask(updatedTask);
     console.log(updatedTask);
     handleClose();
   };
 
-  // TODO パフォーマンス改善
-  // setTaskが２回呼ばれているのおかしい
   useEffect(() => {
     const fetchTaskAndDetails = async () => {
       try {
-        const res = await apiClient.get<Task>(`/tasks/${String(taskId)}`);
+        const res = await apiClient.get<TaskWithColumnName>(
+          `/tasks/${String(taskId)}`,
+        );
         console.log(res.data);
         setTask(res.data);
       } catch (err) {
         console.log('タスクを取得できませんでした', err);
       }
     };
-    // useEffectの中で定義した非同期関数を呼び出す際に、
-    // その結果を待たないか、エラーハンドリングをしないと、
-    // TypeScriptはそのPromiseが解決または拒否されるのを待つことができず、
-    // その結果アプリケーションが不安定な状態になる可能性があると警告する
     void fetchTaskAndDetails();
-  }, [taskId, task]); // TODO taskを外す。無限ループする
+  }, [taskId, task]);
 
   return (
     <Container component="main" maxWidth="md">
       <Box sx={{ p: 2 }}>
         {task && taskId ? (
           <>
-            <Typography variant="h4" component="h2">
-              Title: {task['title']}
-              <IconButton
-                color="primary"
-                aria-label="edit task"
-                onClick={handleOpen}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: 1,
+                borderColor: 'divider',
+                pb: 4,
+                mt: 8,
+              }}
+            >
+              <Typography variant="h4" component="h2">
+                {task.title}
+              </Typography>
+              <Box>
+                <IconButton color="primary" onClick={handleOpen}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton color="secondary">
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mt: 2,
+              }}
+            >
+              <Typography variant="body1">期日: {task.due_date}</Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
               >
-                <EditIcon />
-              </IconButton>
-              <IconButton color="secondary" aria-label="delete task">
-                <DeleteIcon />
-              </IconButton>
-            </Typography>
-            <Typography variant="h6">
-              Description: {task.description}
-            </Typography>
-            <Typography variant="body1">
-              Due date: {new Date(task.due_date).toLocaleDateString()}
-            </Typography>
-            <Typography variant="body1">
-              Category: {task.category_name}
-            </Typography>
-            <Typography variant="body1">
-              Status: {task.taskstatus_name}
+                <Chip
+                  label={`カテゴリー: ${task.category_name}`}
+                  variant="outlined"
+                  color="primary"
+                />
+                <Chip
+                  label={`ステータス: ${task.taskstatus_name}`}
+                  variant="outlined"
+                  color="secondary"
+                />
+              </Box>
+            </Box>
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              {task.description}
             </Typography>
             <Dialog open={open} onClose={handleClose}>
               <DialogContent>
