@@ -6,6 +6,9 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
+import { Task } from '../../types/task';
+import { Category } from '../../types/category';
+import { Status } from '../../types/status';
 
 // uuidはサーバー側で生成されるので、idは送信したくない
 type TaskWithoutID = {
@@ -15,26 +18,6 @@ type TaskWithoutID = {
   category_id: string;
   status_id: string;
   user_id: string;
-};
-
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  due_date: Dayjs;
-  category_id: string;
-  status_id: string;
-  user_id: string;
-};
-
-type Category = {
-  id: string;
-  name: string;
-};
-
-type Status = {
-  id: string;
-  name: string;
 };
 
 type TodoFormProps = {
@@ -48,7 +31,7 @@ type TodoFormProps = {
 const initialTaskState: TaskWithoutID = {
   title: '',
   description: '',
-  due_date: dayjs(), // TODO 日付ピッカーで日時選択
+  due_date: dayjs(),
   category_id: '', // カテゴリー一覧を取得し、ドロップダウンに
   status_id: '', // ステータス一覧を取得し、ドロップダウンに
   user_id: '',
@@ -61,26 +44,23 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
   const [statuses, setStatuses] = useState<Status[]>([]);
 
   useEffect(() => {
-    // カテゴリー一覧を取得
-    apiClient
-      .get<Category[]>('/categories')
-      .then((response) => {
-        console.log(response);
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.error('カテゴリー取得できませんでした: ', error);
-      });
+    const fetchCategoriesAndStatuses = async () => {
+      try {
+        const [categoryResponse, statusResponse] = await Promise.all([
+          apiClient.get<Category[]>('/categories'),
+          apiClient.get<Status[]>('/taskstatus'),
+        ]);
 
-    // ステータス一覧を取得
-    apiClient
-      .get<Status[]>('/taskstatus')
-      .then((response) => {
-        setStatuses(response.data);
-      })
-      .catch((error) => {
-        console.error('ステータス取得できませんでした: ', error);
-      });
+        setCategories(categoryResponse.data);
+        setStatuses(statusResponse.data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error('データ取得できませんでした: ', error.message);
+        }
+      }
+    };
+
+    void fetchCategoriesAndStatuses();
   }, []);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -88,7 +68,7 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSubmit = async (
+  const handleTaskCreation = async (
     event: FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     event.preventDefault();
@@ -128,7 +108,12 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
   const { title, category_id, description, due_date, status_id } = formData;
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate autoComplete="off">
+    <Box
+      component="form"
+      onSubmit={handleTaskCreation}
+      noValidate
+      autoComplete="off"
+    >
       <TextField
         name="title"
         label="タスクを入力"
