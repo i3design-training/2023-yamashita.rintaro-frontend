@@ -1,16 +1,16 @@
 import { Card, CardContent, Typography } from '@mui/material';
 import { FC } from 'react';
 
-type cardProps = {
+type CardProps = {
   name: string;
 };
 
-const CardItem: FC<cardProps> = ({ name }) => {
+export const CardItem: FC<CardProps> = ({ name }) => {
   return (
     <>
       <Card variant="outlined">
         <CardContent>
-          <Typography variant="h5" component="div" textAlign={'center'}>
+          <Typography component="div" textAlign="center">
             {name}
           </Typography>
         </CardContent>
@@ -18,5 +18,3 @@ const CardItem: FC<cardProps> = ({ name }) => {
     </>
   );
 };
-
-export default CardItem;
