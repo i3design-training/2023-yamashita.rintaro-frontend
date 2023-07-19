@@ -1,4 +1,4 @@
-import { DialogActions, TextField, Button } from '@mui/material';
+import { Button, DialogActions, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { apiClient } from '../../config/axios';
 
@@ -6,7 +6,7 @@ type CategoryFormProps = {
   handleCategoryClose: () => void;
 };
 
-const CategoryCreateForm: React.FC<CategoryFormProps> = ({
+export const CategoryCreateForm: React.FC<CategoryFormProps> = ({
   handleCategoryClose,
 }) => {
   const [categoryName, setCategoryName] = useState('');
@@ -50,5 +50,3 @@ const CategoryCreateForm: React.FC<CategoryFormProps> = ({
     </form>
   );
 };
-
-export default CategoryCreateForm;

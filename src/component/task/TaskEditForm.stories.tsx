@@ -1,15 +1,18 @@
-import TaskEditForm from './TaskEditForm';
-import dayjs from 'dayjs';
 import { action } from '@storybook/addon-actions';
+import { StoryFn } from '@storybook/react';
+import dayjs from 'dayjs';
+import { TaskEditForm, TaskEditFormProps } from './TaskEditForm';
 
 export default {
   title: 'Components/TaskEditForm',
   component: TaskEditForm,
 };
 
-const Template = (args) => <TaskEditForm {...args} />;
+const template: StoryFn<TaskEditFormProps> = (args) => (
+  <TaskEditForm {...args} />
+);
 
-export const Default = Template.bind({});
+export const Default = template.bind({});
 Default.args = {
   task: {
     title: 'サンプルタスク',

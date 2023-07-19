@@ -1,16 +1,16 @@
 import {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
   Dispatch,
-  SetStateAction,
   FC,
   ReactNode,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
 
 // トークンとその更新関数を持つcontextを作成。デフォルト値は空のトークンと空関数
-const TokenContext = createContext<
+const tokenContext = createContext<
   [
     string,
     Dispatch<SetStateAction<string>>,
@@ -54,12 +54,12 @@ export const TokenProvider: FC<TokenProviderProps> = ({ children }) => {
 
   return (
     // 子コンポーネントからトークンを取得・更新可能に
-    <TokenContext.Provider
+    <tokenContext.Provider
       value={[token, setToken, userId, setUserId, userName, setUserName]}
     >
       {children}
-    </TokenContext.Provider>
+    </tokenContext.Provider>
   );
 };
 
-export const useToken = () => useContext(TokenContext);
+export const useToken = () => useContext(tokenContext);

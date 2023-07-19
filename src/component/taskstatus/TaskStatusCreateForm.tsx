@@ -1,4 +1,4 @@
-import { DialogActions, TextField, Button } from '@mui/material';
+import { Button, DialogActions, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { apiClient } from '../../config/axios';
 
@@ -6,7 +6,7 @@ type TaskStatusCreateFormProps = {
   handleTaskStatusClose: () => void;
 };
 
-const TaskStatusCreateForm: React.FC<TaskStatusCreateFormProps> = ({
+export const TaskStatusCreateForm: React.FC<TaskStatusCreateFormProps> = ({
   handleTaskStatusClose,
 }) => {
   const [taskStatusName, setTaskStatusName] = useState('');
@@ -50,5 +50,3 @@ const TaskStatusCreateForm: React.FC<TaskStatusCreateFormProps> = ({
     </form>
   );
 };
-
-export default TaskStatusCreateForm;

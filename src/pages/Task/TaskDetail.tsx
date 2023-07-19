@@ -12,7 +12,7 @@ import {
 import { Dayjs } from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import TaskEditForm from '../../component/task/TaskEditForm';
+import { TaskEditForm } from '../../component/task/TaskEditForm';
 import { apiClient } from '../../config/axios';
 
 type TaskWithColumnName = {

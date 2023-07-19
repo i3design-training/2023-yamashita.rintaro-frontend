@@ -1,10 +1,10 @@
-import { FC, ChangeEvent, FormEvent, useState, useEffect } from 'react';
-import { Box, Button, TextField, MenuItem } from '@mui/material';
-import { apiClient } from '../../config/axios';
-import dayjs, { Dayjs } from 'dayjs';
+import { Box, Button, MenuItem, TextField } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import dayjs, { Dayjs } from 'dayjs';
+import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
+import { apiClient } from '../../config/axios';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
 
@@ -26,14 +26,14 @@ type TaskWithCategoryNameStatusName = {
   taskstatus_name: string;
 };
 
-type TaskEditFormProps = {
+export type TaskEditFormProps = {
   task: Task;
   onTaskUpdated: (task: Task) => void;
   handleClose: () => void;
   taskId: string;
 };
 
-const TaskEditForm: FC<TaskEditFormProps> = ({
+export const TaskEditForm: FC<TaskEditFormProps> = ({
   task,
   onTaskUpdated,
   handleClose,
@@ -164,5 +164,3 @@ const TaskEditForm: FC<TaskEditFormProps> = ({
     </Box>
   );
 };
-
-export default TaskEditForm;

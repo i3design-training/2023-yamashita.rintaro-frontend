@@ -7,10 +7,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import SearchInput from '../../component/SearchInput/SearchInput';
-import TaskCreateForm from '../../component/task/TaskCreateForm';
+import { SearchInput } from '../../component/SearchInput/SearchInput';
+import { TaskCreateForm } from '../../component/task/TaskCreateForm';
 import { TaskListItem } from '../../component/task/TaskListItem';
-import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
+import { TitleAndCreateButton } from '../../component/titleAndCreateButton/titleAndCreateButton';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
 import { Task } from '../../types/task';
@@ -96,7 +96,7 @@ const Tasks = () => {
               task={task}
               index={index}
               checked={checked}
-              handleToggle={handleToggleChecked}
+              handleToggleChecked={handleToggleChecked}
             />
           ))}
         </List>

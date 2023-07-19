@@ -19,7 +19,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { apiClient } from '../config/axios';
 import { useToken } from '../context/TokenContext';
 
-type HeaderProps = {
+export type HeaderProps = {
   sections: readonly {
     title: string;
     url: string;

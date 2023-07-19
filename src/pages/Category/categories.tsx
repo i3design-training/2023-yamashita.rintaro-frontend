@@ -8,8 +8,8 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { CardItem } from '../../component/cardItem/CardItem';
-import CategoryCreateForm from '../../component/category/CategoryCreateForm';
-import TitleAndCreateButton from '../../component/titleAndCreateButton/titleAndCreateButton';
+import { CategoryCreateForm } from '../../component/category/CategoryCreateForm';
+import { TitleAndCreateButton } from '../../component/titleAndCreateButton/titleAndCreateButton';
 import { apiClient } from '../../config/axios';
 import { Category } from '../../types/category';
 

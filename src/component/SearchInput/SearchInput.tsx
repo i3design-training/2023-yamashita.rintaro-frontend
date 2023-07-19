@@ -1,19 +1,19 @@
-import { Container, TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { Container, InputAdornment, TextField } from '@mui/material';
 import { FC } from 'react';
 
-type InputProps = {
+export type SearchInputProps = {
   handleFilter: (e: React.ChangeEvent<HTMLInputElement>) => void; // フォームが閉じられる時に呼び出す関数
 };
 
-const SearchInput: FC<InputProps> = ({ handleFilter }) => {
+export const SearchInput: FC<SearchInputProps> = ({ handleFilter }) => {
   return (
     <Container maxWidth="md">
       <TextField
         id="search"
         type="search"
         label="Search"
-        defaultValue={''}
+        defaultValue=""
         onChange={handleFilter}
         InputProps={{
           // TextFiledにアイコンなどの装飾をする
@@ -27,5 +27,3 @@ const SearchInput: FC<InputProps> = ({ handleFilter }) => {
     </Container>
   );
 };
-
-export default SearchInput;

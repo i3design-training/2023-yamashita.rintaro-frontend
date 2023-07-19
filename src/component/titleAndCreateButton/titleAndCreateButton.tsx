@@ -1,17 +1,17 @@
+import { Box, Button, Typography } from '@mui/material';
 import { FC } from 'react';
-import { Typography, Button, Box } from '@mui/material';
 
 export type TitleAndCreateButtonProps = {
   titleText: string;
   onButtonClick: () => void;
 };
 
-const TitleAndCreateButton: FC<TitleAndCreateButtonProps> = ({
+export const TitleAndCreateButton: FC<TitleAndCreateButtonProps> = ({
   titleText,
   onButtonClick,
 }) => (
   <Box sx={{ display: 'flex', my: 8, justifyContent: 'space-between' }}>
-    <Typography id="title" variant="h3" textAlign={'center'}>
+    <Typography id="title" variant="h3" textAlign="center">
       {titleText}
     </Typography>
     <Button variant="contained" onClick={onButtonClick} sx={{ my: 0.5 }}>
@@ -19,5 +19,3 @@ const TitleAndCreateButton: FC<TitleAndCreateButtonProps> = ({
     </Button>
   </Box>
 );
-
-export default TitleAndCreateButton;

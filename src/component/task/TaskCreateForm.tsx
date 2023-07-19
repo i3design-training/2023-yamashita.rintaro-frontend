@@ -1,14 +1,14 @@
-import { FC, ChangeEvent, FormEvent, useState, useEffect } from 'react';
-import { Box, Button, TextField, MenuItem } from '@mui/material';
-import { apiClient } from '../../config/axios';
-import { useToken } from '../../context/TokenContext';
+import { Box, Button, MenuItem, TextField } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
-import { Task } from '../../types/task';
+import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
+import { apiClient } from '../../config/axios';
+import { useToken } from '../../context/TokenContext';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
+import { Task } from '../../types/task';
 
 // uuidはサーバー側で生成されるので、idは送信したくない
 type TaskWithoutID = {
@@ -20,7 +20,7 @@ type TaskWithoutID = {
   user_id: string;
 };
 
-type TodoFormProps = {
+export type TodoFormProps = {
   // set関数だからvoidでOK
   // 送信はIDを、入れたくない
   // レスポンスにはIDが欲しい
@@ -37,7 +37,10 @@ const initialTaskState: TaskWithoutID = {
   user_id: '',
 };
 
-const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
+export const TaskCreateForm: FC<TodoFormProps> = ({
+  onTaskCreated,
+  onClose,
+}) => {
   const [, , userId] = useToken();
   const [formData, setFormData] = useState<TaskWithoutID>(initialTaskState);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -105,7 +108,7 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
     }
   };
 
-  const { title, category_id, description, due_date, status_id } = formData;
+  const { title, category_id, description, status_id } = formData;
 
   return (
     <Box
@@ -181,5 +184,3 @@ const TaskCreateForm: FC<TodoFormProps> = ({ onTaskCreated, onClose }) => {
     </Box>
   );
 };
-
-export default TaskCreateForm;
