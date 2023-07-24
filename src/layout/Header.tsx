@@ -15,9 +15,10 @@ import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { apiClient } from '../config/axios';
-import { useToken } from '../context/TokenContext';
+import { AppDispatch, RootState } from '../app/store';
+import { logoutUser } from '../features/users/usersSlice';
 
 export type HeaderProps = {
   sections: readonly {
@@ -29,9 +30,12 @@ export type HeaderProps = {
 
 export const Header = ({ sections, title }: HeaderProps) => {
   const [isLogin, setIsLogin] = useState(false);
-  const [token, setToken, userId, setUserId, , setUserName] = useToken();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const token = useSelector((state: RootState) => state.users.token);
+  const userId = useSelector((state: RootState) => state.users.userId);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -48,8 +52,6 @@ export const Header = ({ sections, title }: HeaderProps) => {
     setAnchorElUser(null);
   };
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     const checkLoginStatus = () => {
       // 明示的にboolean型に変換
@@ -61,12 +63,7 @@ export const Header = ({ sections, title }: HeaderProps) => {
 
   const logout = async () => {
     try {
-      await apiClient.post('/users/logout', { userId: userId });
-      localStorage.removeItem('token');
-      setIsLogin(false);
-      setToken('');
-      setUserId('');
-      setUserName('');
+      await dispatch(logoutUser(userId));
       navigate('/login');
     } catch (error) {
       console.log(error);

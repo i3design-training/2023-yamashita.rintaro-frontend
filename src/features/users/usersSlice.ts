@@ -18,6 +18,17 @@ export const loginUser = createAsyncThunk(
   },
 );
 
+export const logoutUser = createAsyncThunk(
+  'user/logoutUser',
+  async (userId: string) => {
+    try {
+      await apiClient.post('/users/logout', { userId });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+);
+
 const initialState = {
   token: localStorage.getItem('token') ?? '',
   userId: localStorage.getItem('userId') ?? '',
@@ -49,6 +60,18 @@ const userSlice = createSlice({
       state.userName = action.payload;
       localStorage.setItem('userName', action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(logoutUser.fulfilled, (state) => {
+      // ログアウト後にstateを初期状態にリセット
+      state.token = '';
+      state.userId = '';
+      state.userName = '';
+      // stateとローカルストレージを一致させ、互いに反映するように保つ
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+    });
   },
 });
 
