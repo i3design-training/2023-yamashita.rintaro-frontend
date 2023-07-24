@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { store } from './app/store';
 import { TokenProvider } from './context/TokenContext';
 import './index.css';
 import { Header } from './layout/Header';
@@ -86,9 +88,11 @@ const container = document.getElementById('root');
 if (container) {
   ReactDOM.createRoot(container).render(
     <StrictMode>
-      <TokenProvider>
-        <RouterProvider router={router} />
-      </TokenProvider>
+      <Provider store={store}>
+        <TokenProvider>
+          <RouterProvider router={router} />
+        </TokenProvider>
+      </Provider>
     </StrictMode>,
   );
 }
