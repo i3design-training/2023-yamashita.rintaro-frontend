@@ -8,40 +8,47 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { FormEvent, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { apiClient } from '../../config/axios';
-import { useToken } from '../../context/TokenContext';
+import { AppDispatch } from '../../app/store';
+import {
+  loginUser,
+  setToken,
+  setUserId,
+  setUserName,
+} from '../../features/users/usersSlice';
 
 const defaultTheme = createTheme();
 
 const SignIn = () => {
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
-  const [token, setToken, userId, setUserId, userName, setUserName] =
-    useToken();
 
   const navigate = useNavigate();
-
-  type ApiResponse = {
-    token: string;
-    user_id: string;
-    username: string;
-  };
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!email || !password) {
+      console.error('emailとpasswordの両方が必要です');
+      return;
+    }
+
     try {
-      const response = await apiClient.post<ApiResponse>('/users/login', {
-        email,
-        password,
-      });
-      localStorage.setItem('userId', response.data.user_id);
-      setToken(response.data.token);
-      setUserId(response.data.user_id);
-      setUserName(response.data.username);
-      console.log(response);
+      const actionResult = await dispatch(loginUser({ email, password }));
+      const result = unwrapResult(actionResult);
+      console.log(result);
+      if (result) {
+        dispatch(setToken(result.token));
+        dispatch(setUserId(result.user_id));
+        dispatch(setUserName(result.username));
+        navigate('/');
+      } else {
+        console.error('No payload returned');
+      }
       navigate('/');
     } catch (error) {
       console.error('Error during registration:', error);
