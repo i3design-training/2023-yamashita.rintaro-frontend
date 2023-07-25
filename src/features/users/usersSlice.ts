@@ -1,8 +1,31 @@
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+  PayloadAction,
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+} from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { apiClient } from '../../config/axios';
 import { LoginUserResponse } from '../../types/LoginUserResponse';
 import { User } from '../../types/User';
+
+type UserState = {
+  user: User | null;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null | undefined;
+  token: string;
+  userId: string;
+  userName: string;
+};
+
+const initialState: UserState = {
+  user: null,
+  status: 'idle',
+  error: null,
+  token: localStorage.getItem('token') ?? '',
+  userId: localStorage.getItem('userId') ?? '',
+  userName: localStorage.getItem('userName') ?? '',
+};
 
 // createAsyncThunk: 非同期処理をより簡単に扱うためのユーティリティ関数
 //    非同期アクションを作成する際に、通常は3つのアクションタイプ（request, success, failure）を定義し、
@@ -33,6 +56,7 @@ export const loginUser = createAsyncThunk(
       });
       console.log(response);
       return response.data;
+      // unknownを使用することで型安全性を保ちつつ、任意の型のエラー(今回はAxiosエラー)をキャッチすることが可能に
     } catch (err: unknown) {
       // 大体axiosエラーなので、AxiosErrorという型を使用
       if (axios.isAxiosError(err)) {
@@ -84,23 +108,43 @@ export const registerUser = createAsyncThunk(
   },
 );
 
-type UserState = {
-  user: User | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null | undefined;
-  token: string;
-  userId: string;
-  userName: string;
-};
+export const fetchUser = createAsyncThunk(
+  'user/fetchUser',
+  async (username: string, thunkAPI) => {
+    try {
+      const response = await apiClient.get<User>(`/users/${username}`);
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const error: AxiosError = err;
+        console.log(error);
+        return thunkAPI.rejectWithValue(error.response?.data);
+      }
+      throw err;
+    }
+  },
+);
 
-const initialState: UserState = {
-  user: null,
-  status: 'idle',
-  error: null,
-  token: localStorage.getItem('token') ?? '',
-  userId: localStorage.getItem('userId') ?? '',
-  userName: localStorage.getItem('userName') ?? '',
-};
+export const updateUser = createAsyncThunk(
+  'user/updateUser',
+  async ({ username, user }: { username: string; user: User }, thunkAPI) => {
+    try {
+      console.log(username, user);
+      const response = await apiClient.put<User>(
+        `/users/${username}/edit`,
+        user,
+      );
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const error: AxiosError = err;
+        console.log('ユーザーupdate失敗', error);
+        return thunkAPI.rejectWithValue(error.response?.data);
+      }
+      throw err;
+    }
+  },
+);
 
 // Reduxでは、アプリケーション全体の状態を管理する。
 // この全体の状態を「state」と呼ぶ
@@ -117,19 +161,19 @@ const userSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       // setTokenアクションが発行されたとき、そのアクションが持っているデータ（payload）をstateのtokenにセット
       state.token = action.payload;
-      localStorage.setItem('token', action.payload);
+      localStorage.setItem('token', action.payload ?? '');
     },
     setUserId: (state, action: PayloadAction<string>) => {
       state.userId = action.payload;
-      localStorage.setItem('userId', action.payload);
+      localStorage.setItem('userId', action.payload ?? '');
     },
     setUserName: (state, action: PayloadAction<string>) => {
       state.userName = action.payload;
-      localStorage.setItem('userName', action.payload);
+      localStorage.setItem('userName', action.payload ?? '');
     },
   },
   // extraReducers: スライス外のアクションに対するレスポンスを定義する
-  // スライス外（つまり、別のスライスや非同期関数（thunk）から発行される）
+  // スライス外（別のスライスや非同期関数（thunk）から発行される）
   extraReducers: (builder) => {
     builder
       .addCase(logoutUser.fulfilled, (state) => {
@@ -147,15 +191,38 @@ const userSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        // レスポンスデータがアクションのpayloadとして提供され、stateのuserにセット
         state.user = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
+        state.status = 'failed';
+        // エラー情報がアクションのerrorとして提供され、その中のmessageがstateのerrorにセット
+        state.error = action.error.message;
+      })
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       });
   },
 });
 
+export const selectUser = createSelector(
+  (state: { user: UserState }) => state.user,
+  (user) => user,
+);
+
+// アクションクリエーター
 export const { setToken, setUserId, setUserName } = userSlice.actions;
 
 // ディスパッチされたアクションに応じて状態をどのように更新するかを定義
