@@ -1,57 +1,66 @@
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { apiClient } from '../../config/axios';
-import { useToken } from '../../context/TokenContext';
-
-type User = {
-  email?: string;
-  username?: string;
-};
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../app/store';
+import {
+  fetchUser,
+  setUserName,
+  updateUser,
+} from '../../features/users/usersSlice';
 
 const UserProfile = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [, , , , username, setUserName] = useToken();
+  const originalName = useSelector((state: RootState) => state.users.userName);
+  const [username, setUsername] = useState(originalName);
+  const [email, setEmail] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const dispatch = useDispatch<AppDispatch>();
+  // const user = useSelector((state: RootState) => selectUser(state, username));
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!username) return;
-      try {
-        const result = await apiClient.get<User>(`/users/${username}`);
-        setUser(result.data);
-      } catch (error) {
-        setErrorMessage('ユーザー取得失敗');
+    // 1. レンダリング時に自分の情報を取得
+    const fetchData = async () => {
+      if (username) {
+        try {
+          const res = await dispatch(fetchUser(username));
+          const data = res.payload as { username: string; email: string };
+          setUsername(data.username);
+          setEmail(data.email);
+        } catch (error) {
+          setErrorMessage('ユーザーの取得に失敗しました。');
+        }
       }
     };
 
-    void fetchUserData();
-  }, [username]);
+    void fetchData();
+  }, []);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (user) {
-      setUser({
-        ...user,
-        [event.target.name]: event.target.value,
-      } as User);
-    }
+  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(event.target.value);
+  };
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // userがnullまたはundefinedでない場合にのみusernameプロパティにアクセス
-    if (user?.username) {
+    if (username && email) {
       try {
-        await apiClient.put(`/users/${username}/edit`, user);
-        setUserName(user.username);
-        setSuccessMessage('ユーザー情報が更新されました');
+        const res = await dispatch(
+          // usernameはリクエストURLに含めるために送信。
+          updateUser({ username: originalName, user: { username, email } }),
+        );
+        setSuccessMessage('プロフィールを更新しました。');
+        console.log(res);
+        dispatch(setUserName(username));
       } catch (error) {
-        setErrorMessage('ユーザー情報の更新に失敗しました');
+        setErrorMessage('プロフィールの更新に失敗しました。');
       }
     }
   };
 
-  return user ? (
+  return username && email ? (
     <Container component="main" maxWidth="xs">
       <Box
         sx={{
@@ -75,8 +84,8 @@ const UserProfile = () => {
             name="username"
             autoComplete="username"
             autoFocus
-            value={user.username}
-            onChange={handleChange}
+            value={username}
+            onChange={handleUsernameChange}
           />
           <TextField
             variant="outlined"
@@ -87,8 +96,8 @@ const UserProfile = () => {
             label="Email Address"
             id="email"
             autoComplete="email"
-            value={user.email}
-            onChange={handleChange}
+            value={email}
+            onChange={handleEmailChange}
           />
           <Button
             type="submit"

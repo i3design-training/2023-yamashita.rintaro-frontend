@@ -1,4 +1,5 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { CircularProgress } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -10,7 +11,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { apiClient } from '../../config/axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../app/store';
+import { registerUser } from '../../features/users/usersSlice';
 
 const defaultTheme = createTheme();
 
@@ -18,21 +21,24 @@ const Registration = () => {
   const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [preRegistrationSuccess, setPreRegistrationSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const dispatch = useDispatch<AppDispatch>();
+  const registrationStatus = useSelector(
+    (state: RootState) => state.users.status,
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      const response = await apiClient.post('/users/provisionalRegister', {
-        username,
-        email,
-        password,
-      });
-      console.log(response);
-      setPreRegistrationSuccess(true);
+      const res = await dispatch(registerUser({ username, email, password }));
+      // TODO: エラー時に画面にエラーメッセージを表示させる
+      // reduxのpayloadの仕様で、エラーをcatchできない
+      console.log(res);
     } catch (error) {
-      console.error('Error during registration:', error);
+      setError(String(error));
+      console.error('登録中にエラーが発生しました:', error);
     }
   };
 
@@ -60,11 +66,19 @@ const Registration = () => {
           <Typography component="h1" variant="h5">
             新規登録{' '}
           </Typography>
-          {preRegistrationSuccess && (
+
+          {registrationStatus === 'loading' && <CircularProgress />}
+          {registrationStatus === 'succeeded' && (
             <Typography color="primary">
               仮登録が完了しました。メールをご確認ください。
             </Typography>
           )}
+          {registrationStatus === 'failed' && (
+            <Typography color="error">仮登録失敗</Typography>
+          )}
+
+          {/* TODO: エラーメッセージを表示させる */}
+          {error && <Typography color="error">{error}</Typography>}
           <Box
             component="form"
             noValidate
