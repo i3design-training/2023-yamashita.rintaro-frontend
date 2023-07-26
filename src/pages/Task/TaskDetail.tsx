@@ -133,10 +133,10 @@ const TaskDetail = () => {
             <Dialog open={open} onClose={handleClose}>
               <DialogContent>
                 <TaskEditForm
-                  task={task}
-                  handleClose={handleClose}
+                  initialTask={task}
+                  onModalClose={handleClose}
                   taskId={taskId}
-                  onTaskUpdated={onTaskUpdated}
+                  onTaskUpdate={onTaskUpdated}
                 />
               </DialogContent>
             </Dialog>
