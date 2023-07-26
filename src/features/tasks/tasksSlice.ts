@@ -60,6 +60,24 @@ export const addNewTask = createAsyncThunk(
   },
 );
 
+export const updateTask = createAsyncThunk(
+  'task/updateTask',
+  async ({ taskId, task }: { taskId: string; task: Task }, thunkAPI) => {
+    try {
+      console.log(taskId, task);
+      const response = await apiClient.put<Task>(`/tasks/${taskId}/edit`, task);
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const error: AxiosError = err;
+        console.log('タスクupdate失敗', error);
+        return thunkAPI.rejectWithValue(error.response?.data);
+      }
+      throw err;
+    }
+  },
+);
+
 const taskSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -95,6 +113,14 @@ const taskSlice = createSlice({
         state.tasks.push(action.payload);
       })
       .addCase(addNewTask.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? null;
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.tasks.push(action.payload);
+      })
+      .addCase(updateTask.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message ?? null;
       });

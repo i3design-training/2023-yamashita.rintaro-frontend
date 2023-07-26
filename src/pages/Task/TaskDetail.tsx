@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 import { TaskEditForm } from '../../component/task/TaskEditForm';
 import { apiClient } from '../../config/axios';
 
-type TaskWithColumnName = {
+export type TaskWithColumnName = {
   title: string;
   description: string;
   due_date: Dayjs;
@@ -30,6 +30,7 @@ const TaskDetail = () => {
   const [task, setTask] = useState<TaskWithColumnName | null>(null);
   const [open, setOpen] = useState(false);
 
+  // 以下の2つtoggleにできそう
   const handleOpen = () => {
     setOpen(true);
   };
@@ -57,7 +58,7 @@ const TaskDetail = () => {
       }
     };
     void fetchTaskAndDetails();
-  }, [taskId, task]);
+  }, [taskId]);
 
   return (
     <Container component="main" maxWidth="md">

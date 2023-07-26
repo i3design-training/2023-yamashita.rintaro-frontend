@@ -5,6 +5,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { apiClient } from '../../config/axios';
+import { TaskWithColumnName } from '../../pages/Task/TaskDetail';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
 
@@ -16,19 +17,9 @@ type Task = {
   status_id: string;
 };
 
-type TaskWithCategoryNameStatusName = {
-  title: string;
-  description: string;
-  due_date: Dayjs;
-  category_id: string;
-  status_id: string;
-  category_name: string;
-  taskstatus_name: string;
-};
-
 export type TaskEditFormProps = {
   task: Task;
-  onTaskUpdated: (task: Task) => void;
+  onTaskUpdated: (task: TaskWithColumnName) => void;
   handleClose: () => void;
   taskId: string;
 };
@@ -80,8 +71,8 @@ export const TaskEditForm: FC<TaskEditFormProps> = ({
       const res = await apiClient.put<Task>(`/tasks/${taskId}`, {
         ...formData,
         due_date: formData.due_date,
-      } as TaskWithCategoryNameStatusName);
-      onTaskUpdated(res.data);
+      } as TaskWithColumnName);
+      onTaskUpdated(res.data as TaskWithColumnName);
       handleClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
