@@ -1,108 +1,103 @@
 import { Box, Button, MenuItem, TextField } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { apiClient } from '../../config/axios';
+import { TaskWithColumnName } from '../../pages/Task/TaskDetail';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
 
-type Task = {
+type EditableTask = {
   title: string;
   description: string;
   due_date: Dayjs;
   category_id: string;
   status_id: string;
-};
-
-type TaskWithCategoryNameStatusName = {
-  title: string;
-  description: string;
-  due_date: Dayjs;
-  category_id: string;
-  status_id: string;
-  category_name: string;
-  taskstatus_name: string;
 };
 
 export type TaskEditFormProps = {
-  task: Task;
-  onTaskUpdated: (task: Task) => void;
-  handleClose: () => void;
+  initialTask: EditableTask;
+  onTaskUpdate: (task: TaskWithColumnName) => void;
+  onModalClose: () => void;
   taskId: string;
 };
 
 export const TaskEditForm: FC<TaskEditFormProps> = ({
-  task,
-  onTaskUpdated,
-  handleClose,
+  initialTask,
+  onTaskUpdate,
+  onModalClose,
   taskId,
 }) => {
-  const [formData, setFormData] = useState<Task>({
-    ...task,
-    due_date: dayjs(task.due_date),
+  const [taskData, setTaskData] = useState<EditableTask>({
+    ...initialTask,
+    due_date: dayjs(initialTask.due_date),
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
 
   useEffect(() => {
-    const fetchCategoriesAndStatuses = async () => {
+    const fetchTaskData = async () => {
       try {
-        const [categoryResponse, statusResponse] = await Promise.all([
+        const [categoriesData, statusesData] = await Promise.all([
           apiClient.get<Category[]>('/categories'),
           apiClient.get<Status[]>('/taskstatus'),
         ]);
 
-        setCategories(categoryResponse.data);
-        setStatuses(statusResponse.data);
+        setCategories(categoriesData.data);
+        setStatuses(statusesData.data);
       } catch (error: unknown) {
         if (error instanceof Error) {
-          console.error('データ取得できませんでした: ', error.message);
+          console.error('タスク取得失敗: ', error.message);
         }
       }
     };
 
-    void fetchCategoriesAndStatuses();
+    void fetchTaskData();
   }, []);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target;
-    setFormData((prevState) => ({ ...prevState, [name]: value }));
+    setTaskData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSubmit = async (
+  const handleFormSubmit = async (
     event: FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     event.preventDefault();
 
     try {
-      const res = await apiClient.put<Task>(`/tasks/${taskId}`, {
-        ...formData,
-        due_date: formData.due_date,
-      } as TaskWithCategoryNameStatusName);
-      onTaskUpdated(res.data);
-      handleClose();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(`Error while updating task: ${err.message}`);
+      const response = await apiClient.put<TaskWithColumnName>(
+        `/tasks/${taskId}`,
+        taskData,
+      );
+      onTaskUpdate(response.data);
+      onModalClose();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(`タスク編集失敗: ${error.message}`);
       }
     }
   };
 
   const handleDateChange = (date: Dayjs | null) => {
     if (date) {
-      setFormData((prevState) => ({
+      setTaskData((prevState) => ({
         ...prevState,
         due_date: date,
       }));
     }
   };
 
-  const { title, category_id, description, due_date, status_id } = formData;
+  const { title, category_id, description, due_date, status_id } = taskData;
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate autoComplete="off">
+    <Box
+      component="form"
+      onSubmit={handleFormSubmit}
+      noValidate
+      autoComplete="off"
+    >
       <TextField
         name="title"
         label="タスクを入力"
@@ -138,9 +133,7 @@ export const TaskEditForm: FC<TaskEditFormProps> = ({
         sx={{ marginBottom: 2 }}
       />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={['DatePicker']}>
-          <DatePicker value={due_date} onChange={handleDateChange} />
-        </DemoContainer>
+        <DatePicker value={due_date} onChange={handleDateChange} />
       </LocalizationProvider>
       <TextField
         select

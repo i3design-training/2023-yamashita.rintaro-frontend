@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import { tasksReducer } from '../features/tasks/tasksSlice';
 import { usersReducer } from '../features/users/usersSlice';
 
 // Reduxによる状態管理の全体像
@@ -13,6 +14,7 @@ import { usersReducer } from '../features/users/usersSlice';
 export const store = configureStore({
   reducer: {
     users: usersReducer,
+    tasks: tasksReducer,
   },
 });
 
