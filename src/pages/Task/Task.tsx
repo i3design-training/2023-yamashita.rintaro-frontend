@@ -7,21 +7,24 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../app/store';
 import { SearchInput } from '../../component/SearchInput/SearchInput';
 import { TaskCreateForm } from '../../component/task/TaskCreateForm';
 import { TaskListItem } from '../../component/task/TaskListItem';
 import { TitleAndCreateButton } from '../../component/titleAndCreateButton/titleAndCreateButton';
-import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
+import { fetchTasks } from '../../features/tasks/tasksSlice';
 import { Task } from '../../types/task';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [originalTasks, setOriginalTasks] = useState<Task[]>([]); // 追加
+  const [originalTasks, setOriginalTasks] = useState<Task[]>([]);
   const [checked, setChecked] = useState<number[]>([]);
   const [, , userId] = useToken();
   const [filterVal, setFilterVal] = useState('');
   const [taskFormOpen, setTaskFormOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
@@ -29,17 +32,13 @@ const Tasks = () => {
   };
 
   useEffect(() => {
-    apiClient
-      .get<Task[]>('/tasks', { params: { userId } })
-      .then((res) => {
-        setTasks(res.data);
-        setOriginalTasks(res.data);
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    const fetchTasksAsync = async () => {
+      const res = await dispatch(fetchTasks(userId));
+      setTasks(res.payload as Task[]);
+      console.log(res);
+    };
+    void fetchTasksAsync();
+  }, [dispatch, userId]);
 
   useEffect(() => {
     if (filterVal === '') {
