@@ -4,14 +4,17 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../app/store';
 import { apiClient } from '../../config/axios';
 import { useToken } from '../../context/TokenContext';
+import { addNewTask } from '../../features/tasks/tasksSlice';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
 import { Task } from '../../types/task';
 
 // uuidはサーバー側で生成されるので、idは送信したくない
-type TaskWithoutID = {
+export type TaskWithoutID = {
   title: string;
   description: string;
   due_date: Dayjs;
@@ -45,6 +48,7 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
   const [formData, setFormData] = useState<TaskWithoutID>(initialTaskState);
   const [categories, setCategories] = useState<Category[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const fetchCategoriesAndStatuses = async () => {
@@ -71,25 +75,17 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleTaskCreation = async (
-    event: FormEvent<HTMLFormElement>,
-  ): Promise<void> => {
+  const handleTaskCreation = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     console.log(formData);
 
     try {
-      const res = await apiClient.post<Task>('/tasks/create', {
+      const task: TaskWithoutID = {
         ...formData,
         user_id: userId,
-      } as TaskWithoutID); // IDなしで送信
+      };
+      void dispatch(addNewTask(task));
       setFormData(initialTaskState);
-      // Task.tsx
-      //    onTaskCreated={handleNewTask}
-      //    const handleNewTask = (task: Task) => {
-      //      setTasks((prevTasks) => [...prevTasks, task]);
-      //      setTaskFormOpen(false);
-      //    };
-      onTaskCreated(res.data);
       onClose();
     } catch (err: unknown) {
       if (err instanceof Error) {

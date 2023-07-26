@@ -1,4 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios, { AxiosError } from 'axios';
+import { RootState } from '../../app/store';
+import { TaskWithoutID } from '../../component/task/TaskCreateForm';
 import { apiClient } from '../../config/axios';
 import { Task } from '../../types/task';
 
@@ -18,12 +21,12 @@ const initialState: TaskState = { tasks: [], status: 'idle', error: null };
 
 // createAsyncThunkは2つの引数を受け取ります。
 //    アクションのタイププレフィックス：
-//        この例では、'posts/fetchTasks'
+//        この例では、'tasks/fetchTasks'
 //        この文字列は、生成されるアクションのタイプを決定
 //        createAsyncThunkは、このプレフィックスを使用して3つのアクションタイプを自動的に生成します：
-//            'posts/fetchTasks/pending'
-//            'posts/fetchTasks/fulfilled'
-//            'posts/fetchTasks/rejected'
+//            'tasks/fetchTasks/pending'
+//            'tasks/fetchTasks/fulfilled'
+//            'tasks/fetchTasks/rejected'
 //    ペイロードクリエーター関数：
 //        この関数はasyncであるため、非同期処理を行い、Promiseを返すことができる
 //        ペイロードクリエーター関数は、通常2つの引数を取ります：
@@ -39,14 +42,21 @@ export const fetchTasks = createAsyncThunk(
   },
 );
 
-export const addNewPost = createAsyncThunk(
-  'posts/addNewPost',
+export const addNewTask = createAsyncThunk(
+  'tasks/addNewTask',
   // The payload creator receives the partial `{title, content, user}` object
-  async (initialTask) => {
-    // We send the initial data to the fake API server
-    const response = await apiClient.post<Task>('/tasks', initialTask);
-    // The response includes the complete post object, including unique ID
-    return response.data;
+  async (task: TaskWithoutID, thunkAPI) => {
+    try {
+      const response = await apiClient.post<Task>('/tasks/create', task);
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const error: AxiosError = err;
+        console.log(error);
+        return thunkAPI.rejectWithValue(error.response?.data);
+      }
+      throw err;
+    }
   },
 );
 
@@ -80,11 +90,21 @@ const taskSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message ?? null;
       })
-      .addCase(addNewPost.fulfilled, (state, action) => {
+      .addCase(addNewTask.fulfilled, (state, action) => {
+        state.status = 'succeeded';
         state.tasks.push(action.payload);
+      })
+      .addCase(addNewTask.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? null;
       });
   },
 });
+
+export const selectAllTasks = (state: RootState) => state.tasks.tasks;
+
+export const selectTaskById = (state: RootState, taskId: string) =>
+  state.tasks.tasks.find((task) => task.id === taskId);
 
 export const { taskUpdated } = taskSlice.actions;
 
