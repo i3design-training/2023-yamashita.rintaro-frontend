@@ -4,10 +4,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../app/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../app/store';
 import { apiClient } from '../../config/axios';
-import { useToken } from '../../context/TokenContext';
 import { addNewTask } from '../../features/tasks/tasksSlice';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
@@ -44,7 +43,7 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
   onTaskCreated,
   onClose,
 }) => {
-  const [, , userId] = useToken();
+  const userId = useSelector((state: RootState) => state.users.userId);
   const [formData, setFormData] = useState<TaskWithoutID>(initialTaskState);
   const [categories, setCategories] = useState<Category[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
@@ -75,18 +74,19 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleTaskCreation = (event: FormEvent<HTMLFormElement>): void => {
+  const handleTaskCreation = async (
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     event.preventDefault();
-    console.log(formData);
 
+    const task: TaskWithoutID = {
+      ...formData,
+      user_id: userId,
+    };
     try {
-      const task: TaskWithoutID = {
-        ...formData,
-        user_id: userId,
-      };
-      void dispatch(addNewTask(task));
+      const taskCreateResponse = await dispatch(addNewTask(task));
+      onTaskCreated(taskCreateResponse.payload as Task);
       setFormData(initialTaskState);
-      onClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(`Error while creating task: ${err.message}`);
