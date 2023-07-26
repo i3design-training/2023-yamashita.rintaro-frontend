@@ -28,6 +28,7 @@ const Tasks = () => {
 
   const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
+    setOriginalTasks((prevTasks) => [...prevTasks, task]);
     setTaskFormOpen(false);
   };
 
@@ -35,7 +36,7 @@ const Tasks = () => {
     const fetchTasksAsync = async () => {
       const res = await dispatch(fetchTasks(userId));
       setTasks(res.payload as Task[]);
-      console.log(res);
+      setOriginalTasks(res.payload as Task[]);
     };
     void fetchTasksAsync();
   }, [dispatch, userId]);
