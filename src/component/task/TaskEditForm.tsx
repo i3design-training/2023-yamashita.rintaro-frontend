@@ -70,7 +70,6 @@ export const TaskEditForm: FC<TaskEditFormProps> = ({
     try {
       const res = await apiClient.put<Task>(`/tasks/${taskId}`, {
         ...formData,
-        due_date: formData.due_date,
       } as TaskWithColumnName);
       onTaskUpdated(res.data as TaskWithColumnName);
       handleClose();
@@ -130,7 +129,7 @@ export const TaskEditForm: FC<TaskEditFormProps> = ({
       />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DemoContainer components={['DatePicker']}>
-          <DatePicker value={due_date} onChange={handleDateChange} />
+          <DatePicker defaultValue={due_date} onChange={handleDateChange} />
         </DemoContainer>
       </LocalizationProvider>
       <TextField

@@ -9,11 +9,13 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-import { Dayjs } from 'dayjs';
-import { useEffect, useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { AppDispatch } from '../../app/store';
 import { TaskEditForm } from '../../component/task/TaskEditForm';
-import { apiClient } from '../../config/axios';
+import { fetchTaskById } from '../../features/tasks/tasksSlice';
 
 export type TaskWithColumnName = {
   title: string;
@@ -29,6 +31,7 @@ const TaskDetail = () => {
   const { taskId } = useParams<{ taskId?: string }>();
   const [task, setTask] = useState<TaskWithColumnName | null>(null);
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   // 以下の2つtoggleにできそう
   const handleOpen = () => {
@@ -39,20 +42,26 @@ const TaskDetail = () => {
     setOpen(false);
   };
 
-  const onTaskUpdated = (updatedTask: TaskWithColumnName) => {
-    setTask(updatedTask);
-    console.log(updatedTask);
-    handleClose();
-  };
+  // useCallbackは関数をメモ化し、その依存関係が変更されたときにのみ再計算することで、再レンダリングを抑制し、パフォーマンスを向上させる
+  const onTaskUpdated = useCallback(
+    (updatedTask: TaskWithColumnName) => {
+      setTask(updatedTask);
+      console.log(updatedTask);
+      handleClose();
+    },
+    [handleClose],
+  );
 
   useEffect(() => {
     const fetchTaskAndDetails = async () => {
+      if (!taskId) {
+        console.error('Task ID is undefined');
+        return;
+      }
+
       try {
-        const res = await apiClient.get<TaskWithColumnName>(
-          `/tasks/${String(taskId)}`,
-        );
-        console.log(res.data);
-        setTask(res.data);
+        const res = await dispatch(fetchTaskById(taskId));
+        setTask(res.payload as TaskWithColumnName);
       } catch (err) {
         console.log('タスクを取得できませんでした', err);
       }
@@ -96,7 +105,9 @@ const TaskDetail = () => {
                 mt: 2,
               }}
             >
-              <Typography variant="body1">期日: {task.due_date}</Typography>
+              <Typography variant="body1">
+                期日: {dayjs(task.due_date).format('YYYY-MM-DD')}
+              </Typography>
               <Box
                 sx={{
                   display: 'flex',

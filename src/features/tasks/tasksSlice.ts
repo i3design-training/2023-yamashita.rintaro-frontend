@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
 import { TaskWithoutID } from '../../component/task/TaskCreateForm';
 import { apiClient } from '../../config/axios';
+import { TaskWithColumnName } from '../../pages/Task/TaskDetail';
 import { Task } from '../../types/task';
 
 type TaskState = {
@@ -39,6 +40,25 @@ export const fetchTasks = createAsyncThunk(
       params: { userId },
     });
     return response.data;
+  },
+);
+
+export const fetchTaskById = createAsyncThunk(
+  'tasks/fetchTaskById',
+  async (taskId: string, thunkAPI) => {
+    try {
+      const response = await apiClient.get<TaskWithColumnName>(
+        `/tasks/${taskId}`,
+      );
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const error: AxiosError = err;
+        console.log(error);
+        return thunkAPI.rejectWithValue(error.response?.data);
+      }
+      throw err;
+    }
   },
 );
 
