@@ -1,10 +1,10 @@
 import {
+  CircularProgress,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
   List,
-  Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ import { SearchInput } from '../../component/SearchInput/SearchInput';
 import { TaskCreateForm } from '../../component/task/TaskCreateForm';
 import { TaskListItem } from '../../component/task/TaskListItem';
 import { TitleAndCreateButton } from '../../component/titleAndCreateButton/titleAndCreateButton';
+import { useGetTasksQuery } from '../../features/api/apiSlice';
 import { fetchTasks, selectAllTasks } from '../../features/tasks/tasksSlice';
 import { Task } from '../../types/task';
 
@@ -24,6 +25,22 @@ const Tasks = () => {
   const [filterVal, setFilterVal] = useState('');
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+
+  type TasksQueryResult = {
+    data?: Task[];
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+    error?: unknown;
+  };
+
+  const {
+    data: storedTasks = [] as Task[],
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  }: TasksQueryResult = useGetTasksQuery({ userId });
 
   const handleNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
@@ -66,6 +83,28 @@ const Tasks = () => {
     setChecked(newChecked);
   };
 
+  let content;
+
+  if (isLoading) {
+    content = <CircularProgress />;
+  } else if (isSuccess) {
+    content = (
+      <List sx={{ width: '100%', marginTop: 3 }}>
+        {storedTasks.map((task, index) => (
+          <TaskListItem
+            key={task.id}
+            task={task}
+            index={index}
+            checked={checked}
+            handleToggleChecked={handleToggleChecked}
+          />
+        ))}
+      </List>
+    );
+  } else if (isError && error instanceof Error) {
+    content = <div>{error.toString()}</div>;
+  }
+
   return (
     <Container component="main" maxWidth="md">
       <TitleAndCreateButton
@@ -85,23 +124,7 @@ const Tasks = () => {
       {/* Search Bar */}
       <SearchInput handleFilter={handleFilter} />
 
-      {tasks.length > 0 ? (
-        <List sx={{ width: '100%', marginTop: 3 }}>
-          {tasks.map((task, index) => (
-            <TaskListItem
-              key={task.id}
-              task={task}
-              index={index}
-              checked={checked}
-              handleToggleChecked={handleToggleChecked}
-            />
-          ))}
-        </List>
-      ) : (
-        <Typography variant="h6" component="h3" sx={{ marginTop: 3 }}>
-          タスクがありません
-        </Typography>
-      )}
+      {content}
     </Container>
   );
 };
