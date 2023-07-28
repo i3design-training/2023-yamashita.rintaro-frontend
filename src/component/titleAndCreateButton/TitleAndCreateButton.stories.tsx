@@ -3,7 +3,7 @@ import { Meta, StoryFn } from '@storybook/react';
 import {
   TitleAndCreateButton,
   TitleAndCreateButtonProps,
-} from './titleAndCreateButton';
+} from './TitleAndCreateButton';
 
 export default {
   title: 'Components/TitleAndCreateButton',

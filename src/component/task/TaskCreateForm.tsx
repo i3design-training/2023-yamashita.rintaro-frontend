@@ -4,23 +4,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../app/store';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../app/store';
 import { apiClient } from '../../config/axios';
-import { addNewTask } from '../../features/tasks/tasksSlice';
+import { useAddTaskMutation } from '../../features/api/apiSlice';
+import { TaskWithoutID } from '../../types/TaskWithoutID';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
 import { Task } from '../../types/task';
-
-// uuidはサーバー側で生成されるので、idは送信したくない
-export type TaskWithoutID = {
-  title: string;
-  description: string;
-  due_date: Dayjs;
-  category_id: string;
-  status_id: string;
-  user_id: string;
-};
 
 export type TodoFormProps = {
   // set関数だからvoidでOK
@@ -47,7 +38,7 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
   const [formData, setFormData] = useState<TaskWithoutID>(initialTaskState);
   const [categories, setCategories] = useState<Category[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
-  const dispatch = useDispatch<AppDispatch>();
+  const [addTask, { isLoading, isError, isSuccess }] = useAddTaskMutation();
 
   useEffect(() => {
     const fetchCategoriesAndStatuses = async () => {
@@ -79,13 +70,13 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
   ): Promise<void> => {
     event.preventDefault();
 
-    const task: TaskWithoutID = {
+    const newTaskData: TaskWithoutID = {
       ...formData,
       user_id: userId,
     };
     try {
-      const taskCreateResponse = await dispatch(addNewTask(task));
-      onTaskCreated(taskCreateResponse.payload as Task);
+      const taskCreateResponse = await addTask({ taskData: newTaskData });
+      onTaskCreated(taskCreateResponse.data as Task);
       setFormData(initialTaskState);
     } catch (err: unknown) {
       if (err instanceof Error) {
