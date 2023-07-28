@@ -1,9 +1,9 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
-import { TaskWithoutID } from '../../component/task/TaskCreateForm';
 import { apiClient } from '../../config/axios';
 import { TaskWithColumnName } from '../../pages/Task/TaskDetail';
+import { TaskWithoutID } from '../../types/TaskWithoutID';
 import { Task } from '../../types/task';
 
 type TaskState = {
@@ -72,7 +72,7 @@ export const addNewTask = createAsyncThunk(
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const error: AxiosError = err;
-        console.log(error);
+        console.log('タスクCreate失敗', error);
         return thunkAPI.rejectWithValue(error.response?.data);
       }
       throw err;

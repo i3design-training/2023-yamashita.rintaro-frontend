@@ -1,7 +1,8 @@
 // React特有のエントリーポイントからRTK Queryのメソッドをインポート
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse, isAxiosError } from 'axios';
 import { apiClient } from '../../config/axios';
+import { TaskWithoutID } from '../../types/TaskWithoutID';
 import { Task } from '../../types/task';
 
 type QueryParams = {
@@ -32,8 +33,22 @@ export const apiSlice = createApi({
         result = await apiClient({ url, method, data: body });
       }
       return { data: result.data };
-    } catch (axiosError) {
-      return { error: axiosError };
+    } catch (error: unknown) {
+      if (isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        return {
+          error: {
+            message: axiosError.message,
+            name: axiosError.name,
+            config: axiosError.config,
+          },
+        };
+      }
+      return {
+        error: {
+          message: 'An error occurred.',
+        },
+      };
     }
   },
   // "エンドポイント"はこのサーバーの操作とリクエストを表します
@@ -49,9 +64,9 @@ export const apiSlice = createApi({
         body: null,
       }),
     }),
-    addTask: builder.mutation({
-      query: ({ taskData }: { taskData: unknown }) => ({
-        url: '/tasks',
+    addTask: builder.mutation<Task, { taskData: TaskWithoutID }>({
+      query: ({ taskData }) => ({
+        url: '/tasks/create',
         method: 'POST',
         body: taskData,
       }),

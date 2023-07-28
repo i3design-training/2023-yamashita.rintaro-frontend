@@ -7,101 +7,100 @@ import {
   List,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../app/store';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../app/store';
 import { SearchInput } from '../../component/SearchInput/SearchInput';
 import { TaskCreateForm } from '../../component/task/TaskCreateForm';
 import { TaskListItem } from '../../component/task/TaskListItem';
-import { TitleAndCreateButton } from '../../component/titleAndCreateButton/titleAndCreateButton';
-import { useGetTasksQuery } from '../../features/api/apiSlice';
-import { fetchTasks, selectAllTasks } from '../../features/tasks/tasksSlice';
+import { TitleAndCreateButton } from '../../component/titleAndCreateButton/TitleAndCreateButton';
+import {
+  useAddTaskMutation,
+  useGetTasksQuery,
+} from '../../features/api/apiSlice';
+import { selectAllTasks } from '../../features/tasks/tasksSlice';
+import { TaskWithoutID } from '../../types/TaskWithoutID';
+import { TasksQueryResult } from '../../types/TasksQueryResult';
 import { Task } from '../../types/task';
 
-const Tasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const originalTasks = useSelector(selectAllTasks);
-  const [checked, setChecked] = useState<number[]>([]);
+const TaskPage = () => {
+  const allTasks = useSelector(selectAllTasks);
+  const [checkedTaskIds, setCheckedTaskIds] = useState<number[]>([]);
   const userId = useSelector((state: RootState) => state.users.userId);
-  const [filterVal, setFilterVal] = useState('');
-  const [taskFormOpen, setTaskFormOpen] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
-
-  type TasksQueryResult = {
-    data?: Task[];
-    isLoading: boolean;
-    isSuccess: boolean;
-    isError: boolean;
-    error?: unknown;
-  };
+  const [filterKeyword, setFilterKeyword] = useState('');
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
-    data: storedTasks = [] as Task[],
-    isLoading,
-    isSuccess,
-    isError,
+    data: fetchedTasks = [] as Task[],
+    isLoading: isLoadingTasks,
+    isSuccess: isTasksQuerySuccessful,
+    isError: isTasksQueryFailed,
     error,
   }: TasksQueryResult = useGetTasksQuery({ userId });
+  const [displayedTasks, setDisplayedTasks] = useState<Task[]>(fetchedTasks);
 
-  const handleNewTask = (task: Task) => {
-    setTasks((prevTasks) => [...prevTasks, task]);
-    setTaskFormOpen(false);
+  const [addTask, { isLoading: isAddingTask }] = useAddTaskMutation();
+
+  const handleNewTaskCreation = async (taskData: TaskWithoutID) => {
+    setErrorMessage(null);
+    try {
+      // ミューテーションの結果を直接取得します
+      // この結果はTask型としてcreatedTaskに格納されます
+      const createdTask: Task = await addTask({ taskData }).unwrap();
+      console.log(createdTask);
+      setIsTaskFormOpen(false);
+    } catch (error) {
+      setErrorMessage('タスクの作成に失敗しました。');
+    }
   };
 
   useEffect(() => {
-    const fetchTasksAsync = async () => {
-      const res = await dispatch(fetchTasks(userId));
-      setTasks(res.payload as Task[]);
-    };
-    void fetchTasksAsync();
-  }, [dispatch, userId]);
-
-  useEffect(() => {
-    if (filterVal === '') {
-      setTasks(originalTasks);
+    if (filterKeyword === '') {
+      setDisplayedTasks(allTasks);
     } else {
-      const filteredData = tasks.filter((item) =>
-        item.title.toLowerCase().includes(filterVal),
+      const filteredTasks = displayedTasks.filter((task) =>
+        task.title.toLowerCase().includes(filterKeyword),
       );
-      setTasks(filteredData);
+      setDisplayedTasks(filteredTasks);
     }
-  }, [filterVal]);
+  }, [filterKeyword]);
 
-  const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterVal(e.target.value);
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterKeyword(e.target.value);
   };
 
-  const handleToggleChecked = (value: number) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
+  const handleToggleTaskCheck = (taskId: number) => () => {
+    const currentCheckedIndex = checkedTaskIds.indexOf(taskId);
+    const newCheckedTaskIds = [...checkedTaskIds];
 
-    if (currentIndex === -1) {
-      newChecked.push(value);
+    if (currentCheckedIndex === -1) {
+      newCheckedTaskIds.push(taskId);
     } else {
-      newChecked.splice(currentIndex, 1);
+      newCheckedTaskIds.splice(currentCheckedIndex, 1);
     }
 
-    setChecked(newChecked);
+    setCheckedTaskIds(newCheckedTaskIds);
   };
 
   let content;
 
-  if (isLoading) {
+  if (isLoadingTasks) {
     content = <CircularProgress />;
-  } else if (isSuccess) {
+  } else if (isTasksQuerySuccessful) {
     content = (
       <List sx={{ width: '100%', marginTop: 3 }}>
-        {storedTasks.map((task, index) => (
+        {fetchedTasks.map((task, index) => (
           <TaskListItem
             key={task.id}
             task={task}
             index={index}
-            checked={checked}
-            handleToggleChecked={handleToggleChecked}
+            checkedTaskIds={checkedTaskIds}
+            handleToggleTaskCheck={handleToggleTaskCheck}
           />
         ))}
       </List>
     );
-  } else if (isError && error instanceof Error) {
+  } else if (isTasksQueryFailed && error instanceof Error) {
     content = <div>{error.toString()}</div>;
   }
 
@@ -109,24 +108,25 @@ const Tasks = () => {
     <Container component="main" maxWidth="md">
       <TitleAndCreateButton
         titleText="タスク"
-        onButtonClick={() => setTaskFormOpen(true)}
+        onButtonClick={() => setIsTaskFormOpen(true)}
       />
-      <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+      <Dialog open={isTaskFormOpen} onClose={() => setIsTaskFormOpen(false)}>
         <DialogTitle>タスクを作成</DialogTitle>
         <DialogContent>
           <TaskCreateForm
-            onTaskCreated={handleNewTask}
-            onClose={() => setTaskFormOpen(false)}
+            onTaskCreated={handleNewTaskCreation}
+            onClose={() => setIsTaskFormOpen(false)}
           />
         </DialogContent>
       </Dialog>
 
-      {/* Search Bar */}
-      <SearchInput handleFilter={handleFilter} />
+      <SearchInput handleFilterChange={handleFilterChange} />
 
       {content}
     </Container>
   );
 };
 
-export default Tasks;
+export default TaskPage;
