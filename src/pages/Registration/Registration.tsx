@@ -11,7 +11,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { registerUser } from '../../features/users/usersSlice';
@@ -25,9 +25,6 @@ type IFormInputs = {
 };
 
 const Registration = () => {
-  const [username, setUserName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const {
     // 各入力フィールドをReact Hook Formに登録するための関数
@@ -43,8 +40,11 @@ const Registration = () => {
     (state: RootState) => state.users.status,
   );
 
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  // dataは、React Hook FormのhandleSubmit関数から提供されるオブジェクト
+  // フォームの各フィールドの現在の値を含んでいる
+  const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
+    // dataオブジェクトからusername、email、passwordを取り出す
+    const { username, email, password } = data;
 
     try {
       const res = await dispatch(registerUser({ username, email, password }));
@@ -56,13 +56,6 @@ const Registration = () => {
       console.error('登録中にエラーが発生しました:', error);
     }
   };
-
-  // event.target.valueで引数に指定したstateを更新
-  const handleInputChange =
-    (setState: React.Dispatch<React.SetStateAction<string>>) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setState(event.target.value);
-    };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -95,7 +88,12 @@ const Registration = () => {
 
           {/* TODO: エラーメッセージを表示させる */}
           {error && <Typography color="error">{error}</Typography>}
-          <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 3 }}>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit(onSubmit)}
+            sx={{ mt: 3 }}
+          >
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -104,9 +102,7 @@ const Registration = () => {
                   id="name"
                   label="名前"
                   autoComplete="family-name"
-                  value={username}
                   {...register('username')}
-                  onChange={handleInputChange(setUserName)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -116,9 +112,7 @@ const Registration = () => {
                   id="email"
                   label="メールアドレス"
                   autoComplete="email"
-                  value={email}
                   {...register('email')}
-                  onChange={handleInputChange(setEmail)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -130,7 +124,6 @@ const Registration = () => {
                   id="password"
                   autoComplete="new-password"
                   {...register('password')}
-                  onChange={handleInputChange(setPassword)}
                 />
               </Grid>
             </Grid>
@@ -144,7 +137,7 @@ const Registration = () => {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/login" variant="body2">
                   ログインはこちら
                 </Link>
               </Grid>
