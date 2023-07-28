@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { Grid } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -15,6 +16,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import { AppDispatch } from '../../app/store';
+import { ErrorMessage } from '../../component/ErrorMessage/ErrorMessage';
 import {
   loginUser,
   setToken,
@@ -86,26 +88,35 @@ const SignIn = () => {
             noValidate
             sx={{ mt: 1 }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              autoComplete="email"
-              autoFocus
-              {...register('email')}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              {...register('password')}
-            />
+            <Grid container>
+              <Grid item xs={12}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  autoComplete="email"
+                  autoFocus
+                  {...register('email')}
+                />
+                <ErrorMessage message={errors.email?.message} />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  {...register('password')}
+                />
+                <ErrorMessage message={errors.password?.message} />
+              </Grid>
+            </Grid>
             <Button
               type="submit"
               fullWidth

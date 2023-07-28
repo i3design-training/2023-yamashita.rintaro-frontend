@@ -16,6 +16,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { AppDispatch, RootState } from '../../app/store';
+import { ErrorMessage } from '../../component/ErrorMessage/ErrorMessage';
 import { registerUser } from '../../features/users/usersSlice';
 import { userRegistrationSchema } from '../../helpers/validationSchemas';
 
@@ -108,8 +109,8 @@ const Registration = () => {
                   autoComplete="family-name"
                   {...register('username')}
                 />
+                <ErrorMessage message={errors.username?.message} />
               </Grid>
-              <p>{errors.username?.message}</p>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -119,8 +120,8 @@ const Registration = () => {
                   autoComplete="email"
                   {...register('email')}
                 />
+                <ErrorMessage message={errors.email?.message} />
               </Grid>
-              <p>{errors.email?.message}</p>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -131,8 +132,8 @@ const Registration = () => {
                   autoComplete="new-password"
                   {...register('password')}
                 />
+                <ErrorMessage message={errors.password?.message} />
               </Grid>
-              <p>{errors.password?.message}</p>
             </Grid>
             <Button
               type="submit"
