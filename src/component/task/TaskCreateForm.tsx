@@ -7,7 +7,6 @@ import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import { apiClient } from '../../config/axios';
-// import { addNewTask } from '../../features/tasks/tasksSlice';
 import { useAddTaskMutation } from '../../features/api/apiSlice';
 import { TaskWithoutID } from '../../types/TaskWithoutID';
 import { Category } from '../../types/category';
@@ -76,9 +75,7 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
       user_id: userId,
     };
     try {
-      console.log(newTaskData);
       const taskCreateResponse = await addTask({ taskData: newTaskData });
-      console.log(taskCreateResponse);
       onTaskCreated(taskCreateResponse.data as Task);
       setFormData(initialTaskState);
     } catch (err: unknown) {

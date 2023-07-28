@@ -64,7 +64,12 @@ export const apiSlice = createApi({
         body: null,
       }),
     }),
+    // 型アサーションがないために暗黙的にany
+    // mutationがサーバーからのレスポンスとして受け取るデータはTask型
+    // 入力パラメータは{ taskData: TaskWithoutID }型
     addTask: builder.mutation<Task, { taskData: TaskWithoutID }>({
+      // taskData は、このmutationに渡される引数
+      // queryパラメータではない
       query: ({ taskData }) => ({
         url: '/tasks/create',
         method: 'POST',
