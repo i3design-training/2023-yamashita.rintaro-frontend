@@ -11,24 +11,39 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { registerUser } from '../../features/users/usersSlice';
 
 const defaultTheme = createTheme();
 
+type IFormInputs = {
+  username: string;
+  email: string;
+  password: string;
+};
+
 const Registration = () => {
   const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const {
+    // 各入力フィールドをReact Hook Formに登録するための関数
+    register,
+    // フォームの現在の状態を表すオブジェクトで、エラー情報を含む
+    formState: { errors },
+    // フォームの送信を処理するための関数
+    handleSubmit,
+  } = useForm<IFormInputs>();
 
   const dispatch = useDispatch<AppDispatch>();
   const registrationStatus = useSelector(
     (state: RootState) => state.users.status,
   );
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
@@ -42,6 +57,7 @@ const Registration = () => {
     }
   };
 
+  // event.target.valueで引数に指定したstateを更新
   const handleInputChange =
     (setState: React.Dispatch<React.SetStateAction<string>>) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,12 +95,7 @@ const Registration = () => {
 
           {/* TODO: エラーメッセージを表示させる */}
           {error && <Typography color="error">{error}</Typography>}
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
-          >
+          <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -92,9 +103,9 @@ const Registration = () => {
                   fullWidth
                   id="name"
                   label="名前"
-                  name="name"
                   autoComplete="family-name"
                   value={username}
+                  {...register('username')}
                   onChange={handleInputChange(setUserName)}
                 />
               </Grid>
@@ -104,9 +115,9 @@ const Registration = () => {
                   fullWidth
                   id="email"
                   label="メールアドレス"
-                  name="email"
                   autoComplete="email"
                   value={email}
+                  {...register('email')}
                   onChange={handleInputChange(setEmail)}
                 />
               </Grid>
@@ -114,12 +125,11 @@ const Registration = () => {
                 <TextField
                   required
                   fullWidth
-                  name="password"
                   label="パスワード"
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                  value={password}
+                  {...register('password')}
                   onChange={handleInputChange(setPassword)}
                 />
               </Grid>
