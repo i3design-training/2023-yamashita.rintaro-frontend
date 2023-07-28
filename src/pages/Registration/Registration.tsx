@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { CircularProgress } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
@@ -13,16 +14,23 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import * as yup from 'yup';
 import { AppDispatch, RootState } from '../../app/store';
 import { registerUser } from '../../features/users/usersSlice';
 
 const defaultTheme = createTheme();
 
-type IFormInputs = {
-  username: string;
-  email: string;
-  password: string;
-};
+// Yupを使用してバリデーションスキーマを定義
+const schema = yup
+  .object({
+    username: yup.string().required(),
+    email: yup.string().required(),
+    password: yup.string().required(),
+  })
+  .required();
+
+// YupのInferTypeを使用して、スキーマからフォームデータの型を推論します。
+type UserRegistrationData = yup.InferType<typeof schema>;
 
 const Registration = () => {
   const [error, setError] = useState('');
@@ -33,7 +41,9 @@ const Registration = () => {
     formState: { errors },
     // フォームの送信を処理するための関数
     handleSubmit,
-  } = useForm<IFormInputs>();
+  } = useForm<UserRegistrationData>({
+    resolver: yupResolver(schema),
+  });
 
   const dispatch = useDispatch<AppDispatch>();
   const registrationStatus = useSelector(
@@ -42,7 +52,9 @@ const Registration = () => {
 
   // dataは、React Hook FormのhandleSubmit関数から提供されるオブジェクト
   // フォームの各フィールドの現在の値を含んでいる
-  const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
+  const handleRegistrationSubmit: SubmitHandler<UserRegistrationData> = async (
+    data,
+  ) => {
     // dataオブジェクトからusername、email、passwordを取り出す
     const { username, email, password } = data;
 
@@ -91,7 +103,7 @@ const Registration = () => {
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(handleRegistrationSubmit)}
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
@@ -105,6 +117,7 @@ const Registration = () => {
                   {...register('username')}
                 />
               </Grid>
+              <p>{errors.username?.message}</p>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -115,6 +128,7 @@ const Registration = () => {
                   {...register('email')}
                 />
               </Grid>
+              <p>{errors.email?.message}</p>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -126,6 +140,7 @@ const Registration = () => {
                   {...register('password')}
                 />
               </Grid>
+              <p>{errors.password?.message}</p>
             </Grid>
             <Button
               type="submit"
