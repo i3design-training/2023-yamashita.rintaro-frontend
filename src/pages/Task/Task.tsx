@@ -27,6 +27,8 @@ const TaskPage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
+    // dataはAPIから取得したタスクのデータを含む
+    // もしdataがundefinedであれば、fetchedTasksはデフォルトで空の配列
     data: fetchedTasks = [] as Task[],
     isLoading: isLoadingTasks,
     isSuccess: isTasksQuerySuccessful,
