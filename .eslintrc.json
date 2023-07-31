@@ -90,7 +90,12 @@
       }
     ]
   },
-  "ignorePatterns": [".eslintrc.js", ".eslintrc.v2.js", "src/types/api.ts"],
+  "ignorePatterns": [
+    ".eslintrc.js",
+    ".eslintrc.v2.js",
+    "src/types/api.ts",
+    "jest.config.js"
+  ],
   "overrides": [
     {
       "files": ["*/pages/**/**.tsx"],
