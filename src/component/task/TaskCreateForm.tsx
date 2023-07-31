@@ -75,6 +75,8 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
       user_id: userId,
     };
     try {
+      // ミューテーションの結果を直接取得します
+      // この結果はTask型としてcreatedTaskに格納されます
       const taskCreateResponse = await addTask({ taskData: newTaskData });
       onTaskCreated(taskCreateResponse.data as Task);
       setFormData(initialTaskState);

@@ -13,12 +13,8 @@ import { SearchInput } from '../../component/SearchInput/SearchInput';
 import { TaskCreateForm } from '../../component/task/TaskCreateForm';
 import { TaskListItem } from '../../component/task/TaskListItem';
 import { TitleAndCreateButton } from '../../component/titleAndCreateButton/TitleAndCreateButton';
-import {
-  useAddTaskMutation,
-  useGetTasksQuery,
-} from '../../features/api/apiSlice';
+import { useGetTasksQuery } from '../../features/api/apiSlice';
 import { selectAllTasks } from '../../features/tasks/tasksSlice';
-import { TaskWithoutID } from '../../types/TaskWithoutID';
 import { TasksQueryResult } from '../../types/TasksQueryResult';
 import { Task } from '../../types/task';
 
@@ -39,16 +35,11 @@ const TaskPage = () => {
   }: TasksQueryResult = useGetTasksQuery({ userId });
   const [displayedTasks, setDisplayedTasks] = useState<Task[]>(fetchedTasks);
 
-  const [addTask, { isLoading: isAddingTask }] = useAddTaskMutation();
-
-  const handleNewTaskCreation = async (taskData: TaskWithoutID) => {
+  const handleNewTaskCreation = (taskData: Task) => {
     setErrorMessage(null);
     try {
-      // ミューテーションの結果を直接取得します
-      // この結果はTask型としてcreatedTaskに格納されます
-      const createdTask: Task = await addTask({ taskData }).unwrap();
-      console.log(createdTask);
       setIsTaskFormOpen(false);
+      setDisplayedTasks([...displayedTasks, taskData]);
     } catch (error) {
       setErrorMessage('タスクの作成に失敗しました。');
     }
@@ -58,12 +49,12 @@ const TaskPage = () => {
     if (filterKeyword === '') {
       setDisplayedTasks(allTasks);
     } else {
-      const filteredTasks = displayedTasks.filter((task) =>
+      const filteredTasks = allTasks.filter((task) =>
         task.title.toLowerCase().includes(filterKeyword),
       );
       setDisplayedTasks(filteredTasks);
     }
-  }, [filterKeyword]);
+  }, [filterKeyword, allTasks]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterKeyword(e.target.value);
@@ -82,14 +73,21 @@ const TaskPage = () => {
     setCheckedTaskIds(newCheckedTaskIds);
   };
 
+  useEffect(() => {
+    if (isTasksQuerySuccessful) {
+      setDisplayedTasks(fetchedTasks);
+    }
+  }, [isTasksQuerySuccessful, fetchedTasks]);
+
   let content;
 
   if (isLoadingTasks) {
     content = <CircularProgress />;
   } else if (isTasksQuerySuccessful) {
+    console.log(displayedTasks);
     content = (
       <List sx={{ width: '100%', marginTop: 3 }}>
-        {fetchedTasks.map((task, index) => (
+        {displayedTasks.map((task, index) => (
           <TaskListItem
             key={task.id}
             task={task}
