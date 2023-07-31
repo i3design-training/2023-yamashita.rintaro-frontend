@@ -1,4 +1,6 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { Grid } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,38 +11,45 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { FormEvent, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
 import { AppDispatch } from '../../app/store';
+import { ErrorMessage } from '../../component/ErrorMessage/ErrorMessage';
 import {
   loginUser,
   setToken,
   setUserId,
   setUserName,
 } from '../../features/users/usersSlice';
+import { loginSchema } from '../../helpers/validationSchemas';
 
 const defaultTheme = createTheme();
 
 const SignIn = () => {
-  const [email, setEmail] = useState<string | null>(null);
-  const [password, setPassword] = useState<string | null>(null);
+  type UserLoginData = yup.InferType<typeof loginSchema>;
+
+  const {
+    // 各入力フィールドをReact Hook Formに登録するための関数
+    register,
+    // フォームの現在の状態を表すオブジェクトで、エラー情報を含む
+    formState: { errors },
+    // フォームの送信を処理するための関数
+    handleSubmit,
+  } = useForm<UserLoginData>({
+    resolver: yupResolver(loginSchema),
+  });
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!email || !password) {
-      console.error('emailとpasswordの両方が必要です');
-      return;
-    }
-
+  const handleLoginSubmit: SubmitHandler<UserLoginData> = async (data) => {
+    // dataオブジェクトからemail、passwordを取り出す
+    const { email, password } = data;
     try {
       const actionResult = await dispatch(loginUser({ email, password }));
       const result = unwrapResult(actionResult);
-      console.log(result);
       if (result) {
         dispatch(setToken(result.token));
         dispatch(setUserId(result.user_id));
@@ -75,34 +84,39 @@ const SignIn = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(handleLoginSubmit)}
             noValidate
             sx={{ mt: 1 }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
+            <Grid container>
+              <Grid item xs={12}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  autoComplete="email"
+                  autoFocus
+                  {...register('email')}
+                />
+                <ErrorMessage message={errors.email?.message} />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  {...register('password')}
+                />
+                <ErrorMessage message={errors.password?.message} />
+              </Grid>
+            </Grid>
             <Button
               type="submit"
               fullWidth

@@ -16,44 +16,14 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { AppDispatch, RootState } from '../../app/store';
-import {
-  PasswordMinLength,
-  UsernameMaxLength,
-  UsernameMinLength,
-} from '../../constants/formConstants';
+import { ErrorMessage } from '../../component/ErrorMessage/ErrorMessage';
 import { registerUser } from '../../features/users/usersSlice';
+import { userRegistrationSchema } from '../../helpers/validationSchemas';
 
 const defaultTheme = createTheme();
 
-// Yupを使用してバリデーションスキーマを定義
-// Yupを使用してバリデーションスキーマを定義
-const schema = yup
-  .object({
-    username: yup
-      .string()
-      .required('ユーザー名は必須です')
-      .min(UsernameMinLength, 'ユーザー名は最低3文字必要です')
-      .max(UsernameMaxLength, 'ユーザー名は最大20文字までです'),
-    // Yupのemail()メソッドは、入力された文字列が有効なメールアドレスの形式であることを自動的に検証
-    email: yup
-      .string()
-      .required('メールアドレスは必須です')
-      .email('有効なメールアドレスを入力してください'),
-    password: yup
-      .string()
-      .required('パスワードは必須です')
-      .min(PasswordMinLength, 'パスワードは最低8文字必要です')
-      .matches(
-        new RegExp(
-          `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{${PasswordMinLength},}$`,
-        ),
-        `パスワードは最低1つの大文字、1つの小文字、1つの数字を含む${PasswordMinLength}文字以上が必要です`,
-      ),
-  })
-  .required();
-
 // YupのInferTypeを使用して、スキーマからフォームデータの型を推論します。
-type UserRegistrationData = yup.InferType<typeof schema>;
+type UserRegistrationData = yup.InferType<typeof userRegistrationSchema>;
 
 const Registration = () => {
   const [error, setError] = useState('');
@@ -65,7 +35,7 @@ const Registration = () => {
     // フォームの送信を処理するための関数
     handleSubmit,
   } = useForm<UserRegistrationData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(userRegistrationSchema),
   });
 
   const dispatch = useDispatch<AppDispatch>();
@@ -139,8 +109,8 @@ const Registration = () => {
                   autoComplete="family-name"
                   {...register('username')}
                 />
+                <ErrorMessage message={errors.username?.message} />
               </Grid>
-              <p>{errors.username?.message}</p>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -150,8 +120,8 @@ const Registration = () => {
                   autoComplete="email"
                   {...register('email')}
                 />
+                <ErrorMessage message={errors.email?.message} />
               </Grid>
-              <p>{errors.email?.message}</p>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -162,8 +132,8 @@ const Registration = () => {
                   autoComplete="new-password"
                   {...register('password')}
                 />
+                <ErrorMessage message={errors.password?.message} />
               </Grid>
-              <p>{errors.password?.message}</p>
             </Grid>
             <Button
               type="submit"
