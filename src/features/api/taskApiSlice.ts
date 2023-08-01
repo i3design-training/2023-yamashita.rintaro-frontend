@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { TaskWithColumnName } from '../../types/TaskWithColumnName';
 import { TaskWithoutID } from '../../types/TaskWithoutID';
-import { Task } from '../../types/task';
+import { EditableTask, Task } from '../../types/task';
 
 type FetchTasksQueryParams = {
   userId: string;
@@ -52,8 +52,22 @@ export const tasksApiSlice = createApi({
         body: taskData,
       }),
     }),
+    updateTask: builder.mutation<
+      TaskWithColumnName,
+      { taskId: string; taskData: EditableTask }
+    >({
+      query: ({ taskId, taskData }) => ({
+        url: `tasks/${taskId}`,
+        method: 'PUT',
+        body: taskData,
+      }),
+    }),
   }),
 });
 
-export const { useGetTasksQuery, useFetchTaskQuery, useAddTaskMutation } =
-  tasksApiSlice;
+export const {
+  useGetTasksQuery,
+  useFetchTaskQuery,
+  useAddTaskMutation,
+  useUpdateTaskMutation,
+} = tasksApiSlice;

@@ -4,6 +4,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { apiClient } from '../../config/axios';
+import { useUpdateTaskMutation } from '../../features/api/taskApiSlice';
 import { TaskWithColumnName } from '../../types/TaskWithColumnName';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
@@ -19,14 +20,12 @@ type EditableTask = {
 export type TaskEditFormProps = {
   initialTask: EditableTask;
   onTaskUpdate: (task: TaskWithColumnName) => void;
-  onModalClose: () => void;
   taskId: string;
 };
 
 export const TaskEditForm: FC<TaskEditFormProps> = ({
   initialTask,
   onTaskUpdate,
-  onModalClose,
   taskId,
 }) => {
   const [taskData, setTaskData] = useState<EditableTask>({
@@ -56,6 +55,8 @@ export const TaskEditForm: FC<TaskEditFormProps> = ({
     void fetchTaskData();
   }, []);
 
+  const [updateTask] = useUpdateTaskMutation();
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target;
     setTaskData((prevState) => ({ ...prevState, [name]: value }));
@@ -67,12 +68,13 @@ export const TaskEditForm: FC<TaskEditFormProps> = ({
     event.preventDefault();
 
     try {
-      const response = await apiClient.put<TaskWithColumnName>(
-        `/tasks/${taskId}`,
-        taskData,
-      );
-      onTaskUpdate(response.data);
-      onModalClose();
+      const response = await updateTask({ taskId, taskData });
+      if ('data' in response && response.data) {
+        console.log(response);
+        onTaskUpdate(response.data);
+      } else if ('error' in response) {
+        console.error(response.error);
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(`タスク編集失敗: ${error.message}`);

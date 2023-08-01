@@ -2,7 +2,6 @@ import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
 import { apiClient } from '../../config/axios';
-import { TaskWithColumnName } from '../../types/TaskWithColumnName';
 import { Task } from '../../types/task';
 
 type TaskState = {
@@ -32,25 +31,6 @@ const initialState: TaskState = { tasks: [], status: 'idle', error: null };
 //        ペイロードクリエーター関数は、通常2つの引数を取ります：
 //            arg：非同期関数に渡す引数。必要ない場合は_に置き換えられる
 //            thunkAPI：いくつかのフィールドを持つオブジェクトで、dispatchやgetStateなどの関数を含む
-
-export const fetchTaskById = createAsyncThunk(
-  'tasks/fetchTaskById',
-  async (taskId: string, thunkAPI) => {
-    try {
-      const response = await apiClient.get<TaskWithColumnName>(
-        `/tasks/${taskId}`,
-      );
-      return response.data;
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const error: AxiosError = err;
-        console.log(error);
-        return thunkAPI.rejectWithValue(error.response?.data);
-      }
-      throw err;
-    }
-  },
-);
 
 export const updateTask = createAsyncThunk(
   'task/updateTask',

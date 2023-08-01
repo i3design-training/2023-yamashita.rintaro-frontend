@@ -22,6 +22,7 @@ const TaskDetail = () => {
   const [open, setOpen] = useState(false);
 
   const toggleOpen = () => {
+    console.log(open);
     setOpen((prevOpen) => !prevOpen);
   };
 
@@ -104,11 +105,10 @@ const TaskDetail = () => {
             <Typography variant="h6" sx={{ mt: 2 }}>
               {task.description}
             </Typography>
-            <Dialog open={open} onClose={toggleOpen}>
+            <Dialog open={open}>
               <DialogContent>
                 <TaskEditForm
                   initialTask={task}
-                  onModalClose={toggleOpen}
                   taskId={taskId}
                   onTaskUpdate={onTaskUpdated}
                 />
