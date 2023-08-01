@@ -7,7 +7,7 @@ import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import { apiClient } from '../../config/axios';
-import { useAddTaskMutation } from '../../features/api/apiSlice';
+import { useAddTaskMutation } from '../../features/api/taskApiSlice';
 import { TaskWithoutID } from '../../types/TaskWithoutID';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
@@ -75,6 +75,8 @@ export const TaskCreateForm: FC<TodoFormProps> = ({
       user_id: userId,
     };
     try {
+      // ミューテーションの結果を直接取得します
+      // この結果はTask型としてcreatedTaskに格納されます
       const taskCreateResponse = await addTask({ taskData: newTaskData });
       onTaskCreated(taskCreateResponse.data as Task);
       setFormData(initialTaskState);

@@ -9,65 +9,40 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { AppDispatch } from '../../app/store';
 import { TaskEditForm } from '../../component/task/TaskEditForm';
-import { fetchTaskById } from '../../features/tasks/tasksSlice';
-
-export type TaskWithColumnName = {
-  title: string;
-  description: string;
-  due_date: Dayjs;
-  category_id: string;
-  status_id: string;
-  category_name: string;
-  taskstatus_name: string;
-};
+import { useFetchTaskQuery } from '../../features/api/taskApiSlice';
+import { TaskWithColumnName } from '../../types/TaskWithColumnName';
 
 const TaskDetail = () => {
   const { taskId } = useParams<{ taskId?: string }>();
   const [task, setTask] = useState<TaskWithColumnName | null>(null);
   const [open, setOpen] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
 
-  // 以下の2つtoggleにできそう
-  const handleOpen = () => {
-    setOpen(true);
+  const toggleOpen = () => {
+    console.log(open);
+    setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  // useCallbackは関数をメモ化し、その依存関係が変更されたときにのみ再計算することで、再レンダリングを抑制し、パフォーマンスを向上させる
   const onTaskUpdated = useCallback(
     (updatedTask: TaskWithColumnName) => {
       setTask(updatedTask);
-      console.log(updatedTask);
-      handleClose();
+      toggleOpen();
     },
-    [handleClose],
+    [toggleOpen],
   );
 
-  useEffect(() => {
-    const fetchTaskAndDetails = async () => {
-      if (!taskId) {
-        console.error('Task ID is undefined');
-        return;
-      }
+  const { data: taskData, error } = useFetchTaskQuery({ taskId });
 
-      try {
-        const res = await dispatch(fetchTaskById(taskId));
-        setTask(res.payload as TaskWithColumnName);
-      } catch (err) {
-        console.log('タスクを取得できませんでした', err);
-      }
-    };
-    void fetchTaskAndDetails();
-  }, [taskId]);
+  useEffect(() => {
+    if (taskData) {
+      setTask(taskData);
+    } else if (error) {
+      console.log('タスクを取得できませんでした', error);
+    }
+  }, [taskData, error]);
 
   return (
     <Container component="main" maxWidth="md">
@@ -89,7 +64,7 @@ const TaskDetail = () => {
                 {task.title}
               </Typography>
               <Box>
-                <IconButton color="primary" onClick={handleOpen}>
+                <IconButton color="primary" onClick={toggleOpen}>
                   <EditIcon />
                 </IconButton>
                 <IconButton color="secondary">
@@ -130,11 +105,10 @@ const TaskDetail = () => {
             <Typography variant="h6" sx={{ mt: 2 }}>
               {task.description}
             </Typography>
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={open}>
               <DialogContent>
                 <TaskEditForm
                   initialTask={task}
-                  onModalClose={handleClose}
                   taskId={taskId}
                   onTaskUpdate={onTaskUpdated}
                 />
