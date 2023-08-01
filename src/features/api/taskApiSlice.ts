@@ -54,12 +54,12 @@ export const tasksApiSlice = createApi({
     }),
     updateTask: builder.mutation<
       TaskWithColumnName,
-      { taskId: string; taskData: EditableTask }
+      { taskId: string; editableTask: EditableTask }
     >({
-      query: ({ taskId, taskData }) => ({
+      query: ({ taskId, editableTask }) => ({
         url: `tasks/${taskId}`,
         method: 'PUT',
-        body: taskData,
+        body: editableTask,
       }),
     }),
   }),
