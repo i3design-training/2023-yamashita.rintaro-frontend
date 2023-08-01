@@ -13,7 +13,7 @@ import { SearchInput } from '../../component/SearchInput/SearchInput';
 import { TaskCreateForm } from '../../component/task/TaskCreateForm';
 import { TaskListItem } from '../../component/task/TaskListItem';
 import { TitleAndCreateButton } from '../../component/titleAndCreateButton/TitleAndCreateButton';
-import { useGetTasksQuery } from '../../features/api/apiSlice';
+import { useGetTasksQuery } from '../../features/api/taskApiSlice';
 import { selectAllTasks } from '../../features/tasks/tasksSlice';
 import { TasksQueryResult } from '../../types/TasksQueryResult';
 import { Task } from '../../types/task';

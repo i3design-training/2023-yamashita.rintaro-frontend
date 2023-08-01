@@ -2,8 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { RootState } from '../../app/store';
 import { apiClient } from '../../config/axios';
-import { TaskWithColumnName } from '../../pages/Task/TaskDetail';
-import { TaskWithoutID } from '../../types/TaskWithoutID';
+import { TaskWithColumnName } from '../../types/TaskWithColumnName';
 import { Task } from '../../types/task';
 
 type TaskState = {
@@ -33,15 +32,6 @@ const initialState: TaskState = { tasks: [], status: 'idle', error: null };
 //        ペイロードクリエーター関数は、通常2つの引数を取ります：
 //            arg：非同期関数に渡す引数。必要ない場合は_に置き換えられる
 //            thunkAPI：いくつかのフィールドを持つオブジェクトで、dispatchやgetStateなどの関数を含む
-export const fetchTasks = createAsyncThunk(
-  'tasks/fetchTasks',
-  async (userId: string) => {
-    const response = await apiClient.get<Task[]>('/tasks', {
-      params: { userId },
-    });
-    return response.data;
-  },
-);
 
 export const fetchTaskById = createAsyncThunk(
   'tasks/fetchTaskById',
@@ -55,24 +45,6 @@ export const fetchTaskById = createAsyncThunk(
       if (axios.isAxiosError(err)) {
         const error: AxiosError = err;
         console.log(error);
-        return thunkAPI.rejectWithValue(error.response?.data);
-      }
-      throw err;
-    }
-  },
-);
-
-export const addNewTask = createAsyncThunk(
-  'tasks/addNewTask',
-  // The payload creator receives the partial `{title, content, user}` object
-  async (task: TaskWithoutID, thunkAPI) => {
-    try {
-      const response = await apiClient.post<Task>('/tasks/create', task);
-      return response.data;
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const error: AxiosError = err;
-        console.log('タスクCreate失敗', error);
         return thunkAPI.rejectWithValue(error.response?.data);
       }
       throw err;
@@ -117,25 +89,6 @@ const taskSlice = createSlice({
     // addCaseなど、特定のアクションタイプに対応するリデューサーを追加するためのメソッドを提供
     builder
       // addCaseメソッドは、特定のアクションタイプに対応するリデューサーを追加する
-      .addCase(fetchTasks.pending, (state, action) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchTasks.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.tasks = action.payload;
-      })
-      .addCase(fetchTasks.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message ?? null;
-      })
-      .addCase(addNewTask.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.tasks.push(action.payload);
-      })
-      .addCase(addNewTask.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message ?? null;
-      })
       .addCase(updateTask.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.tasks.push(action.payload);

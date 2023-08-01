@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { apiSlice } from '../features/api/apiSlice';
+import { tasksApiSlice } from '../features/api/taskApiSlice';
 import { tasksReducer } from '../features/tasks/tasksSlice';
 import { usersReducer } from '../features/users/usersSlice';
 
@@ -22,12 +22,12 @@ export const store = configureStore({
     // APIスライスのリデューサ。RTK Queryの自動生成機能により作られる
     // ストアオブジェクト内での特定のキー（reducerPath）にリデューサとその状態データを格納する
     // これにより、APIスライスはAPIのキャッシュ状態と更新ロジックを管理できるようになる
-    [apiSlice.reducerPath]: apiSlice.reducer,
+    [tasksApiSlice.reducerPath]: tasksApiSlice.reducer,
   },
   // ミドルウェアを設定。ミドルウェアはアクションがリデューサに届く前に行う処理を定義できる。
   // apiSlice.middlewareを使用することで、RTK Queryによる非同期通信が可能になる。
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(apiSlice.middleware),
+    getDefaultMiddleware().concat(tasksApiSlice.middleware),
 });
 
 // AppDispatchは、Redux Storeのdispatchメソッドの型を表現している。

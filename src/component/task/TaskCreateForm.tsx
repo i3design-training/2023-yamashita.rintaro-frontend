@@ -7,7 +7,7 @@ import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import { apiClient } from '../../config/axios';
-import { useAddTaskMutation } from '../../features/api/apiSlice';
+import { useAddTaskMutation } from '../../features/api/taskApiSlice';
 import { TaskWithoutID } from '../../types/TaskWithoutID';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';

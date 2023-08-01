@@ -4,7 +4,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { apiClient } from '../../config/axios';
-import { TaskWithColumnName } from '../../pages/Task/TaskDetail';
+import { TaskWithColumnName } from '../../types/TaskWithColumnName';
 import { Category } from '../../types/category';
 import { Status } from '../../types/status';
 
