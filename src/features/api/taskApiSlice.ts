@@ -19,20 +19,20 @@ export const tasksApiSlice = createApi({
   // エラーはそれぞれのフックのerrorプロパティに返される
   baseQuery: fetchBaseQuery({
     baseUrl: base_url,
-    prepareHeaders: (headers) => {
-      try {
-        const token = localStorage.getItem('token');
-        if (token !== null) {
-          headers.set('authorization', `Bearer ${token}`);
-        }
-      } catch (error) {
-        console.error(
-          'localStorageからトークンを取得できませんでした。',
-          error,
-        );
-      }
-      return headers;
-    },
+    // prepareHeaders: (headers) => {
+    //   try {
+    //     const token = localStorage.getItem('token');
+    //     if (token !== null) {
+    //       headers.set('authorization', `Bearer ${token}`);
+    //     }
+    //   } catch (error) {
+    //     console.error(
+    //       'localStorageからトークンを取得できませんでした。',
+    //       error,
+    //     );
+    //   }
+    //   return headers;
+    // },
   }),
   endpoints: (builder) => ({
     // タスクを取得するエンドポイント

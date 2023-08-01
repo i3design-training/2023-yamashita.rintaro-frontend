@@ -1,7 +1,5 @@
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios, { AxiosError } from 'axios';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import { apiClient } from '../../config/axios';
 import { Task } from '../../types/task';
 
 type TaskState = {
@@ -32,24 +30,6 @@ const initialState: TaskState = { tasks: [], status: 'idle', error: null };
 //            arg：非同期関数に渡す引数。必要ない場合は_に置き換えられる
 //            thunkAPI：いくつかのフィールドを持つオブジェクトで、dispatchやgetStateなどの関数を含む
 
-export const updateTask = createAsyncThunk(
-  'task/updateTask',
-  async ({ taskId, task }: { taskId: string; task: Task }, thunkAPI) => {
-    try {
-      console.log(taskId, task);
-      const response = await apiClient.put<Task>(`/tasks/${taskId}/edit`, task);
-      return response.data;
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const error: AxiosError = err;
-        console.log('タスクupdate失敗', error);
-        return thunkAPI.rejectWithValue(error.response?.data);
-      }
-      throw err;
-    }
-  },
-);
-
 const taskSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -63,21 +43,6 @@ const taskSlice = createSlice({
       }
     },
   },
-  // 特定のスライスの状態を更新するための追加のリデューサーを定義する
-  // アクションタイプをリッスンし、それらのアクションに基づいてステートを更新するリデューサーを作成
-  extraReducers(builder) {
-    // addCaseなど、特定のアクションタイプに対応するリデューサーを追加するためのメソッドを提供
-    builder
-      // addCaseメソッドは、特定のアクションタイプに対応するリデューサーを追加する
-      .addCase(updateTask.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.tasks.push(action.payload);
-      })
-      .addCase(updateTask.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message ?? null;
-      });
-  },
 });
 
 export const selectAllTasks = (state: RootState) => state.tasks.tasks;
@@ -85,7 +50,7 @@ export const selectAllTasks = (state: RootState) => state.tasks.tasks;
 export const selectTaskById = (state: RootState, taskId: string) =>
   state.tasks.tasks.find((task) => task.id === taskId);
 
-export const { taskUpdated } = taskSlice.actions;
+// export const { taskUpdated } = taskSlice.actions;
 
 // ディスパッチされたアクションに応じて状態をどのように更新するかを定義
 export const tasksReducer = taskSlice.reducer;
